@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders a listbox (snapshot) 1`] = `
+<div
+  role="listbox"
+  tabindex="0"
+>
+  <div
+    data-index="0"
+    id="listbox--1"
+  >
+    Ford
+     
+  </div>
+  <div
+    data-index="1"
+    id="listbox--2"
+  >
+    Tesla
+     
+  </div>
+  <div
+    data-index="2"
+    id="listbox--3"
+  >
+    Toyota
+     
+  </div>
+</div>
+`;

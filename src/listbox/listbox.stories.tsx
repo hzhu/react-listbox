@@ -1,40 +1,38 @@
-import React, { forwardRef, createContext, useRef, HTMLAttributes, createRef, useContext } from "react";
-import { Listbox, ListboxOption } from "./"
+import React from "react";
+import { action } from "@storybook/addon-actions";
+import { Listbox, ListboxOption } from "./";
 
 export default {
   title: "Listbox",
   component: Listbox,
 };
 
-export const Example1 = () => (
-  <Listbox>
-    <ListboxOption>Los Angeles</ListboxOption>
-    <ListboxOption>Imperial</ListboxOption>
-    <ListboxOption>Riverside</ListboxOption>
-    <ListboxOption>San Francisco</ListboxOption>
+const CAR_COMPANIES = [
+  { name: "BMW Group", value: "bmw" },
+  { name: "Daimler AG", value: "daimlier" },
+  { name: "Fiat Chrysler Automobiles", value: "fiat" },
+  { name: "Ford Motor Co.", value: "ford" },
+  { name: "General Motors Co.", value: "gm" },
+  { name: "Honda Motor Company", value: "honda" },
+  { name: "Hyundai Motor Group", value: "hyundai" },
+  { name: "Mazda Motor Corp.", value: "mazda" },
+  { name: "Renault-Nissan-Mitsubishi Alliance", value: "rnm" },
+  { name: "Saab AB", value: "saab" },
+  { name: "Subaru Corp.", value: "subaru" },
+  { name: "Suzuki Motor Corp.", value: "suzuki" },
+  { name: "Tata Motors", value: "tata" },
+  { name: "Tesla Inc.", value: "tesla" },
+  { name: "Toyota Motor Corp.", value: "toyota" },
+  { name: "Volkswagen Group", value: "volkswagen" },
+  { name: "Zhejiang Geely Holding Group", value: "zg" },
+];
+
+export const Uncontrolled = () => (
+  <Listbox onSelect={(item) => console.log(item)}>
+    {CAR_COMPANIES.map((car) => (
+      <ListboxOption id={car.value} value={car.value}>
+        {car.name}
+      </ListboxOption>
+    ))}
   </Listbox>
 );
-
-
-// export const Example2 = () => (
-//   <Listbox>
-//     <ListboxList>
-//       <h2>Mexican</h2>
-//       <ListboxOption>Tacos</ListboxOption>
-//       <ListboxOption>Burritos</ListboxOption>
-//       <ListboxOption>Quesadillas</ListboxOption>
-//     </ListboxList>
-//     <ListboxList>
-//       <h2>Italian</h2>
-//       <ListboxOption>Pasta</ListboxOption>
-//       <ListboxOption>Pizza</ListboxOption>
-//       <ListboxOption>Garlic bread</ListboxOption>
-//     </ListboxList>
-//     <ListboxList>
-//       <h2>German</h2>
-//       <ListboxOption>Schnitzel</ListboxOption>
-//       <ListboxOption>Hamburger</ListboxOption>
-//       <ListboxOption>Bratwurst</ListboxOption>
-//     </ListboxList>
-//   </Listbox>
-// );
