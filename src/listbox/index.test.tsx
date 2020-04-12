@@ -29,15 +29,12 @@ describe("Listbox", () => {
       );
       const listbox = getByRole("listbox");
 
-      fireEvent.focus(listbox);
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.DOWN,
-        which: KEY_CODES.DOWN,
-      });
+      expect(onChange).toBeCalledTimes(0);
 
-      expect(onChange).toHaveBeenCalledWith("tesla");
+      fireEvent.focus(listbox);
+
       expect(onChange).toBeCalledTimes(1);
-      expect(onSelect).toBeCalledTimes(0);
+      expect(onChange).toHaveBeenCalledWith("ford");
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.DOWN,
@@ -46,6 +43,15 @@ describe("Listbox", () => {
 
       expect(onChange).toHaveBeenCalledWith("tesla");
       expect(onChange).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(0);
+
+      fireEvent.keyDown(listbox, {
+        keyCode: KEY_CODES.DOWN,
+        which: KEY_CODES.DOWN,
+      });
+
+      expect(onChange).toHaveBeenCalledWith("tesla");
+      expect(onChange).toBeCalledTimes(3);
       expect(onSelect).toBeCalledTimes(0);
 
       fireEvent.keyDown(listbox, {
@@ -53,7 +59,7 @@ describe("Listbox", () => {
         which: KEY_CODES.RETURN,
       });
 
-      expect(onChange).toBeCalledTimes(2);
+      expect(onChange).toBeCalledTimes(3);
       expect(onChange).toHaveBeenCalledWith("tesla");
       expect(onSelect).toBeCalledTimes(1);
       expect(onSelect).toHaveBeenCalledWith("toyota");

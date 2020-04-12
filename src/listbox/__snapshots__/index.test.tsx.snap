@@ -6,20 +6,17 @@ exports[`Listbox renders a listbox (snapshot) 1`] = `
   tabindex="0"
 >
   <div
-    data-index="0"
-    id="listbox--1"
+    id="listbox--option--ford--1"
   >
     Ford
   </div>
   <div
-    data-index="1"
-    id="listbox--2"
+    id="listbox--option--tesla--2"
   >
     Tesla
   </div>
   <div
-    data-index="2"
-    id="listbox--3"
+    id="listbox--option--toyota--3"
   >
     Toyota
   </div>

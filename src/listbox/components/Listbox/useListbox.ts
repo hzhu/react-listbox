@@ -2,6 +2,7 @@ import {
   useRef,
   useReducer,
   Dispatch,
+  FocusEvent,
   KeyboardEvent,
   MutableRefObject,
 } from "react";
@@ -44,8 +45,9 @@ export interface IUseListboxReturnValue {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
-  onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => void;
   onClickOption: (option: IOption) => void;
+  onFocus: (e: FocusEvent<HTMLDivElement>) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => void;
 }
 
 export interface IUseListboxProps {
@@ -53,15 +55,15 @@ export interface IUseListboxProps {
   onSelect?: (value: string) => void;
 }
 
-export type useListboxType = (
-  props: IUseListboxProps
-) => IUseListboxReturnValue;
-
-export interface IUseKeyDownProps extends IUseListboxProps {
+export interface IListenerProps extends IUseListboxProps {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
 }
+
+export type useListboxType = (
+  props: IUseListboxProps
+) => IUseListboxReturnValue;
 
 const reducer: ReducerType = (state, action) => {
   const { id, index, value } = action.payload;
@@ -93,19 +95,23 @@ const initialState = {
   selectedValue: "",
 };
 
-export interface IUseClickOptionProps extends IUseListboxProps {
-  dispatch: Dispatch<ListboxActionTypes>;
-}
-
-const useClickOption = ({
-  dispatch,
-  onChange,
-  onSelect,
-}: IUseClickOptionProps) => (option: IOption) => {
+const useClickOption = ({ dispatch, onChange, onSelect }: IListenerProps) => (
+  option: IOption
+) => {
   dispatch({ type: FOCUS_OPTION, payload: option });
   dispatch({ type: SELECT_OPTION, payload: option });
   onChange && onChange(option.value);
   onSelect && onSelect(option.value);
+};
+
+const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
+  e: FocusEvent<HTMLDivElement>
+) => {
+  if (state.activeId === "") {
+    const option = options.current[0];
+    dispatch({ type: FOCUS_OPTION, payload: option });
+    onChange && onChange(option.value);
+  }
 };
 
 const useKeyDown = ({
@@ -114,7 +120,7 @@ const useKeyDown = ({
   options,
   onChange,
   onSelect,
-}: IUseKeyDownProps) => (e: KeyboardEvent<HTMLDivElement>) => {
+}: IListenerProps) => (e: KeyboardEvent<HTMLDivElement>) => {
   const key = e.which || e.keyCode;
   const { activeId, activeIndex, focusedValue } = state;
 
@@ -150,21 +156,23 @@ const useKeyDown = ({
 export const useListbox: useListboxType = ({ onChange, onSelect }) => {
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const onKeyDown = useKeyDown({
+  const listboxListenerProps = {
     state,
     dispatch,
     options,
     onChange,
     onSelect,
-  });
+  };
 
-  const onClickOption = useClickOption({ dispatch, onChange, onSelect });
+  const onFocus = useFocus(listboxListenerProps);
+  const onKeyDown = useKeyDown(listboxListenerProps);
+  const onClickOption = useClickOption(listboxListenerProps);
 
   return {
     state,
     dispatch,
     options,
+    onFocus,
     onKeyDown,
     onClickOption,
   };

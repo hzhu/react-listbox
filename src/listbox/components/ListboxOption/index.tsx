@@ -9,9 +9,9 @@ export interface IListboxOptionProps extends HTMLAttributes<HTMLDivElement> {
 
 export const ListboxOption = forwardRef<HTMLDivElement, IListboxOptionProps>(
   (props, ref) => {
-    const stableId = useId();
-    const id = `listbox--${stableId}`;
     const { value, children, ...restProps } = props;
+    const stableId = useId();
+    const id = `listbox--option--${value}--${stableId}`;
     const { options, currentIndexRef, onClickOption } = useListboxContext();
     const index = useRef(currentIndexRef.current++).current;
     const option = { id, index, value };
@@ -24,7 +24,6 @@ export const ListboxOption = forwardRef<HTMLDivElement, IListboxOptionProps>(
       <div
         id={id}
         ref={ref}
-        data-index={index}
         onClick={() => onClickOption && onClickOption(option)}
         {...restProps}
       >

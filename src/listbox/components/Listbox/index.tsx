@@ -12,7 +12,14 @@ export interface IListboxProps
 export const Listbox = forwardRef<HTMLDivElement, IListboxProps>(
   (props, ref) => {
     const { onChange, onSelect, children, ...restProps } = props;
-    const { state, dispatch, options, onKeyDown, onClickOption } = useListbox({
+    const {
+      state,
+      dispatch,
+      options,
+      onFocus,
+      onKeyDown,
+      onClickOption,
+    } = useListbox({
       onChange,
       onSelect,
     });
@@ -38,6 +45,7 @@ export const Listbox = forwardRef<HTMLDivElement, IListboxProps>(
           role="listbox"
           ref={ref}
           tabIndex={0}
+          onFocus={onFocus}
           onKeyDown={onKeyDown}
           {...restProps}
         >
