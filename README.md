@@ -1,6 +1,6 @@
-<h2 align="center">
+<h1 align="center">
   react-listbox ⚛️📝📦
-</h2>
+</h1>
 
 <p align="center">  
   Composable WAI-ARIA compliant listbox React components.
@@ -22,9 +22,7 @@
 
 ## Local Development
 
-[Storybook](https://storybook.js.org/) is used to interactively develop components with hot reloading. The `react-listbox` Storybook is [published here](https://react-listbox.netlify.com).
-
-To run Storybook:
+The project uses [Storybook](https://storybook.js.org/) to interactively develop components with hot reloading. The `react-listbox` Storybook is [published here](https://react-listbox.netlify.com).
 
 Clone this repository
 
