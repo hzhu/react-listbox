@@ -1,12 +1,14 @@
-import { useContext, createContext, MutableRefObject } from "react";
-import { IListboxState, ListboxActionTypes, IItem } from "./useListboxState";
+import { useContext, createContext, Dispatch, MutableRefObject } from "react";
+import { IListboxState, ListboxActionTypes, IOption } from "./useListbox";
 
 export interface IListboxContext {
-  onSelect?: (value: string) => void;
-  currentIndexRef: MutableRefObject<number>;
   state: IListboxState;
-  dispatch: React.Dispatch<ListboxActionTypes>;
-  options: MutableRefObject<IItem[]>;
+  dispatch: Dispatch<ListboxActionTypes>;
+  options: MutableRefObject<IOption[]>;
+  currentIndexRef: MutableRefObject<number>;
+  onClickOption: (option: IOption) => void;
+  onChange?: (value: string) => void;
+  onSelect?: (value: string) => void;
 }
 
 export const ListboxContext = createContext<IListboxContext | undefined>(
@@ -17,7 +19,7 @@ export const useListboxContext = () => {
   const context = useContext(ListboxContext);
 
   if (context === undefined) {
-    throw new Error("I has a sad");
+    throw new Error("useListboxContext must be used within a ListboxProvider");
   }
 
   return context;

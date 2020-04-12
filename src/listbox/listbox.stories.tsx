@@ -1,5 +1,4 @@
-import React from "react";
-import { action } from "@storybook/addon-actions";
+import React, { useState } from "react";
 import { Listbox, ListboxOption } from "./";
 
 export default {
@@ -27,12 +26,27 @@ const CAR_COMPANIES = [
   { name: "Zhejiang Geely Holding Group", value: "zg" },
 ];
 
-export const Uncontrolled = () => (
-  <Listbox onSelect={(item) => console.log(item)}>
-    {CAR_COMPANIES.map((car) => (
-      <ListboxOption id={car.value} value={car.value}>
-        {car.name}
-      </ListboxOption>
-    ))}
-  </Listbox>
-);
+export const Uncontrolled = () => {
+  const [focusedOption, setFocusedOption] = useState<string>();
+  const [selectedOption, setSelectedOption] = useState<string>();
+
+  return (
+    <Listbox
+      onChange={(option) => setFocusedOption(option)}
+      onSelect={(option) => setSelectedOption(option)}
+    >
+      {CAR_COMPANIES.map((car) => {
+        const { name, value } = car;
+        const isFocused = value === focusedOption;
+        const isSelected = value === selectedOption;
+        const style = { background: isFocused ? "#96CCFF" : "" };
+
+        return (
+          <ListboxOption key={value} value={value} style={style}>
+            {name} {isSelected && String.fromCharCode(10003)}
+          </ListboxOption>
+        );
+      })}
+    </Listbox>
+  );
+};
