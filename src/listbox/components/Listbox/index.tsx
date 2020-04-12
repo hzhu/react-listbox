@@ -18,7 +18,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       options,
       onFocus,
       onKeyDown,
-      onClickOption,
+      getOptionProps,
     } = useListbox({
       onChange,
       onSelect,
@@ -35,7 +35,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       options,
       onChange,
       onSelect,
-      onClickOption,
+      getOptionProps,
       currentIndexRef,
     };
 

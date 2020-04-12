@@ -1,11 +1,15 @@
 import {
   useRef,
+  useEffect,
   useReducer,
   Dispatch,
   FocusEvent,
   KeyboardEvent,
   MutableRefObject,
+  HTMLProps,
+  MouseEvent,
 } from "react";
+import { useId } from "@reach/auto-id";
 import { KEY_CODES } from "../../../utils";
 
 export const FOCUS_OPTION = "focus option";
@@ -45,9 +49,9 @@ export interface IUseListboxReturnValue {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
-  onClickOption: (option: IOption) => void;
   onFocus: (e: FocusEvent<HTMLUListElement>) => void;
   onKeyDown: (e: KeyboardEvent<HTMLUListElement>) => void;
+  getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
 }
 
 export interface IUseListboxProps {
@@ -93,15 +97,6 @@ const initialState = {
   activeIndex: 0,
   focusedValue: "",
   selectedValue: "",
-};
-
-const useClickOption = ({ dispatch, onChange, onSelect }: IListenerProps) => (
-  option: IOption
-) => {
-  dispatch({ type: FOCUS_OPTION, payload: option });
-  dispatch({ type: SELECT_OPTION, payload: option });
-  onChange && onChange(option.value);
-  onSelect && onSelect(option.value);
 };
 
 const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
@@ -153,6 +148,11 @@ const useKeyDown = ({
   }
 };
 
+export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
+  index: number;
+  value: string;
+}
+
 export const useListbox: useListboxType = ({ onChange, onSelect }) => {
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -166,7 +166,41 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
 
   const onFocus = useFocus(listboxListenerProps);
   const onKeyDown = useKeyDown(listboxListenerProps);
-  const onClickOption = useClickOption(listboxListenerProps);
+
+  const focusAndSelectOption = (index: number) => {
+    const option = options.current[index];
+    onChange && onChange(option.value);
+    onSelect && onSelect(option.value);
+    dispatch({ type: FOCUS_OPTION, payload: option });
+    dispatch({ type: SELECT_OPTION, payload: option });
+  };
+
+  const getOptionProps = ({
+    ref,
+    index,
+    value,
+    onClick,
+    ...restProps
+  }: IGetOptionProps): HTMLProps<HTMLLIElement> => {
+    const stableId = useId();
+    const id = `option--${value}--${stableId}`;
+
+    useEffect(() => {
+      const option = { id, index, value };
+      options.current[index] = option;
+    }, [id, index, value]);
+
+    return {
+      id,
+      ref,
+      role: "option",
+      onClick: (event: MouseEvent<HTMLLIElement>) => {
+        onClick && onClick(event);
+        focusAndSelectOption(index);
+      },
+      ...restProps,
+    };
+  };
 
   return {
     state,
@@ -174,6 +208,6 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
     options,
     onFocus,
     onKeyDown,
-    onClickOption,
+    getOptionProps,
   };
 };

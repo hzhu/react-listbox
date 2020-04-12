@@ -69,9 +69,7 @@ describe("Listbox", () => {
       const onSelect = jest.fn();
       const { getByText } = render(
         <Listbox onSelect={onSelect} onChange={onChange}>
-          <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
-          <ListboxOption value="toyota">Toyota</ListboxOption>
         </Listbox>
       );
       const tesla = getByText("Tesla");
@@ -82,6 +80,22 @@ describe("Listbox", () => {
       expect(onChange).toHaveBeenCalledWith("tesla");
       expect(onSelect).toBeCalledTimes(1);
       expect(onSelect).toHaveBeenCalledWith("tesla");
+    });
+
+    test("able to composes and call ListboxOption's onClick handler", () => {
+      const onClick = jest.fn();
+      const { getByText } = render(
+        <Listbox>
+          <ListboxOption value="tesla" onClick={onClick}>
+            Tesla
+          </ListboxOption>
+        </Listbox>
+      );
+      const tesla = getByText("Tesla");
+
+      fireEvent.click(tesla);
+
+      expect(onClick).toBeCalledTimes(1);
     });
   });
 });
