@@ -4,12 +4,12 @@ import { ListboxContext } from "./useListboxContext";
 import { useListbox } from "./useListbox";
 
 export interface IListboxProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "onSelect"> {
+  extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect"> {
   onChange?: (value: string) => void;
   onSelect?: (value: string) => void;
 }
 
-export const Listbox = forwardRef<HTMLDivElement, IListboxProps>(
+export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
   (props, ref) => {
     const { onChange, onSelect, children, ...restProps } = props;
     const {
@@ -41,7 +41,7 @@ export const Listbox = forwardRef<HTMLDivElement, IListboxProps>(
 
     return (
       <ListboxContext.Provider value={value}>
-        <div
+        <ul
           role="listbox"
           ref={ref}
           tabIndex={0}
@@ -50,7 +50,7 @@ export const Listbox = forwardRef<HTMLDivElement, IListboxProps>(
           {...restProps}
         >
           {children}
-        </div>
+        </ul>
       </ListboxContext.Provider>
     );
   }

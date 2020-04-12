@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 import { useId } from "@reach/auto-id";
 import { useListboxContext } from "../Listbox/useListboxContext";
 
-export interface IListboxOptionProps extends HTMLAttributes<HTMLDivElement> {
+export interface IListboxOptionProps extends HTMLAttributes<HTMLLIElement> {
   value: string;
 }
 
-export const ListboxOption = forwardRef<HTMLDivElement, IListboxOptionProps>(
+export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
   (props, ref) => {
     const { value, children, ...restProps } = props;
     const stableId = useId();
@@ -21,14 +21,14 @@ export const ListboxOption = forwardRef<HTMLDivElement, IListboxOptionProps>(
     }, [id, index, value]);
 
     return (
-      <div
+      <li
         id={id}
         ref={ref}
         onClick={() => onClickOption && onClickOption(option)}
         {...restProps}
       >
         {children}
-      </div>
+      </li>
     );
   }
 );

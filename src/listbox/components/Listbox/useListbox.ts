@@ -46,8 +46,8 @@ export interface IUseListboxReturnValue {
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
   onClickOption: (option: IOption) => void;
-  onFocus: (e: FocusEvent<HTMLDivElement>) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => void;
+  onFocus: (e: FocusEvent<HTMLUListElement>) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLUListElement>) => void;
 }
 
 export interface IUseListboxProps {
@@ -105,7 +105,7 @@ const useClickOption = ({ dispatch, onChange, onSelect }: IListenerProps) => (
 };
 
 const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
-  e: FocusEvent<HTMLDivElement>
+  e: FocusEvent<HTMLUListElement>
 ) => {
   if (state.activeId === "") {
     const option = options.current[0];
@@ -120,7 +120,7 @@ const useKeyDown = ({
   options,
   onChange,
   onSelect,
-}: IListenerProps) => (e: KeyboardEvent<HTMLDivElement>) => {
+}: IListenerProps) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { activeId, activeIndex, focusedValue } = state;
 
