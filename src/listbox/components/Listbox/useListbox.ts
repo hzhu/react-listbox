@@ -34,9 +34,10 @@ export interface ISelectOption {
 export type ListboxActionTypes = IFocusOption | ISelectOption;
 
 export interface IListboxState {
-  activeId: string;
-  activeIndex: number;
+  focusedId: string;
+  focusedIndex: number;
   focusedValue: string;
+  selectedId: string;
   selectedValue: string;
 }
 
@@ -82,14 +83,15 @@ const reducer: ReducerType = (state, action) => {
     case FOCUS_OPTION:
       return {
         ...state,
-        activeId: id,
-        activeIndex: index,
+        focusedId: id,
+        focusedIndex: index,
         focusedValue: value,
       };
     case SELECT_OPTION:
       return {
         ...state,
-        activeIndex: index,
+        selectedId: id,
+        focusedIndex: index,
         focusedValue: value,
         selectedValue: value,
       };
@@ -99,8 +101,9 @@ const reducer: ReducerType = (state, action) => {
 };
 
 const initialState = {
-  activeId: "",
-  activeIndex: 0,
+  focusedId: "",
+  focusedIndex: 0,
+  selectedId: "",
   focusedValue: "",
   selectedValue: "",
 };
@@ -108,7 +111,7 @@ const initialState = {
 const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
   e: FocusEvent<HTMLUListElement>
 ) => {
-  if (state.activeId === "") {
+  if (state.focusedId === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
     onChange && onChange(option.value);
@@ -123,20 +126,20 @@ const useKeyDown = ({
   onSelect,
 }: IListenerProps) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
-  const { activeId, activeIndex, focusedValue } = state;
+  const { focusedId, focusedIndex, focusedValue } = state;
 
   switch (key) {
     case KEY_CODES.UP:
-      if (activeIndex > 0) {
-        const nextIndex = activeIndex - 1;
+      if (focusedIndex > 0) {
+        const nextIndex = focusedIndex - 1;
         const option = options.current[nextIndex];
         dispatch({ type: FOCUS_OPTION, payload: option });
         onChange && onChange(option.value);
       }
       break;
     case KEY_CODES.DOWN:
-      if (activeIndex !== options.current.length - 1) {
-        const nextIndex = activeIndex + 1;
+      if (focusedIndex !== options.current.length - 1) {
+        const nextIndex = focusedIndex + 1;
         const option = options.current[nextIndex];
         dispatch({ type: FOCUS_OPTION, payload: option });
         onChange && onChange(option.value);
@@ -144,8 +147,8 @@ const useKeyDown = ({
       break;
     case KEY_CODES.RETURN:
       const option = {
-        id: activeId,
-        index: activeIndex,
+        id: focusedId,
+        index: focusedIndex,
         value: focusedValue,
       };
       dispatch({ type: SELECT_OPTION, payload: option });
@@ -195,6 +198,7 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
       id,
       ref,
       role: "option",
+      "aria-selected": id === state.selectedId || undefined,
       onClick: (event: MouseEvent<HTMLLIElement>) => {
         onClick && onClick(event);
         focusAndSelectOption(index);
@@ -213,6 +217,7 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
       onKeyDown,
       tabIndex: 0,
       role: "listbox",
+      "aria-activedescendant": state.selectedId || undefined,
       ...restProps,
     };
   };

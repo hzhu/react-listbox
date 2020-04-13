@@ -1,5 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
 import { Listbox, ListboxOption } from "./";
 import { KEY_CODES } from "../utils";
 
@@ -17,6 +18,57 @@ describe("Listbox", () => {
     expect(listbox).toMatchSnapshot();
   });
   describe("Uncontrolled", () => {
+    test("selecting an option sets the correct aria-activedescendant and aria-selected", () => {
+      const { getByRole, getByText } = render(
+        <Listbox>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const tesla = getByText("Tesla");
+      const toyota = getByText("Toyota");
+
+      fireEvent.focus(listbox);
+
+      fireEvent.keyDown(listbox, {
+        keyCode: KEY_CODES.DOWN,
+        which: KEY_CODES.DOWN,
+      });
+
+      expect(tesla).not.toHaveAttribute("aria-selected");
+      expect(listbox).not.toHaveAttribute("aria-activedescendant");
+
+      fireEvent.keyDown(listbox, {
+        keyCode: KEY_CODES.RETURN,
+        which: KEY_CODES.RETURN,
+      });
+
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+      expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+
+      fireEvent.click(toyota);
+
+      expect(tesla).not.toHaveAttribute("aria-selected");
+      expect(toyota).toHaveAttribute("aria-selected", "true");
+      expect(listbox).toHaveAttribute("aria-activedescendant", toyota.id);
+
+      fireEvent.keyDown(listbox, {
+        keyCode: KEY_CODES.UP,
+        which: KEY_CODES.UP,
+      });
+
+      fireEvent.keyDown(listbox, {
+        keyCode: KEY_CODES.RETURN,
+        which: KEY_CODES.RETURN,
+      });
+
+      expect(toyota).not.toHaveAttribute("aria-selected");
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+      expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+    });
+
     test("calls the onChange & onSelect prop with option's value for keyboard selection", () => {
       const onChange = jest.fn();
       const onSelect = jest.fn();
