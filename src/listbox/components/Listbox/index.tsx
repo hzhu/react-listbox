@@ -12,13 +12,7 @@ export interface IListboxProps
 export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
   (props, ref) => {
     const { onChange, onSelect, children, ...restProps } = props;
-    const {
-      state,
-      dispatch,
-      options,
-      getOptionProps,
-      getListboxProps,
-    } = useListbox({
+    const { getOptionProps, getListboxProps } = useListbox({
       onChange,
       onSelect,
     });
@@ -28,16 +22,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       currentIndexRef.current = 0;
     });
 
-    const value = {
-      state,
-      dispatch,
-      options,
-      onChange,
-      onSelect,
-      getOptionProps,
-      getListboxProps,
-      currentIndexRef,
-    };
+    const value = { getOptionProps, currentIndexRef };
 
     return (
       <ListboxContext.Provider value={value}>

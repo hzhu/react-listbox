@@ -4,10 +4,10 @@ import {
   useReducer,
   Dispatch,
   FocusEvent,
+  MouseEvent,
   KeyboardEvent,
   MutableRefObject,
   HTMLProps,
-  MouseEvent,
 } from "react";
 import { useId } from "@reach/auto-id";
 import { KEY_CODES } from "../../../utils";
@@ -52,9 +52,6 @@ export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
 }
 
 export interface IUseListboxReturnValue {
-  state: IListboxState;
-  dispatch: Dispatch<ListboxActionTypes>;
-  options: MutableRefObject<IOption[]>;
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
   getListboxProps: (
     props: HTMLProps<HTMLUListElement>
@@ -212,24 +209,17 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
   const getListboxProps = ({
     ref,
     ...restProps
-  }: HTMLProps<HTMLUListElement>) => {
-    return {
-      ref,
-      onFocus,
-      onKeyDown,
-      tabIndex: 0,
-      role: "listbox",
-      "aria-activedescendant": state.selectedId || undefined,
-      ...restProps,
-    };
-  };
-
-  return {
-    state,
-    dispatch,
-    options,
+  }: HTMLProps<HTMLUListElement>) => ({
+    ref,
     onFocus,
     onKeyDown,
+    tabIndex: 0,
+    role: "listbox",
+    "aria-activedescendant": state.selectedId || undefined,
+    ...restProps,
+  });
+
+  return {
     getOptionProps,
     getListboxProps,
   };
