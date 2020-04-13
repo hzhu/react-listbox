@@ -91,9 +91,9 @@ const reducer: ReducerType = (state, action) => {
       return {
         ...state,
         selectedId: id,
+        selectedValue: value,
         focusedIndex: index,
         focusedValue: value,
-        selectedValue: value,
       };
     default:
       return state;
@@ -108,9 +108,12 @@ const initialState = {
   selectedValue: "",
 };
 
-const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
-  e: FocusEvent<HTMLUListElement>
-) => {
+const handleFocus = ({
+  state,
+  dispatch,
+  options,
+  onChange,
+}: IListenerProps) => (e: FocusEvent<HTMLUListElement>) => {
   if (state.focusedId === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
@@ -118,7 +121,7 @@ const useFocus = ({ state, dispatch, options, onChange }: IListenerProps) => (
   }
 };
 
-const useKeyDown = ({
+const handleKeyDown = ({
   state,
   dispatch,
   options,
@@ -168,14 +171,13 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
     onSelect,
   };
 
-  const onFocus = useFocus(listboxListenerProps);
-  const onKeyDown = useKeyDown(listboxListenerProps);
+  const onFocus = handleFocus(listboxListenerProps);
+  const onKeyDown = handleKeyDown(listboxListenerProps);
 
   const focusAndSelectOption = (index: number) => {
     const option = options.current[index];
     onChange && onChange(option.value);
     onSelect && onSelect(option.value);
-    dispatch({ type: FOCUS_OPTION, payload: option });
     dispatch({ type: SELECT_OPTION, payload: option });
   };
 
