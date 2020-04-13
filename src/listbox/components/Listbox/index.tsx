@@ -16,9 +16,8 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       state,
       dispatch,
       options,
-      onFocus,
-      onKeyDown,
       getOptionProps,
+      getListboxProps,
     } = useListbox({
       onChange,
       onSelect,
@@ -36,21 +35,13 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       onChange,
       onSelect,
       getOptionProps,
+      getListboxProps,
       currentIndexRef,
     };
 
     return (
       <ListboxContext.Provider value={value}>
-        <ul
-          role="listbox"
-          ref={ref}
-          tabIndex={0}
-          onFocus={onFocus}
-          onKeyDown={onKeyDown}
-          {...restProps}
-        >
-          {children}
-        </ul>
+        <ul {...getListboxProps({ ref, ...restProps })}>{children}</ul>
       </ListboxContext.Provider>
     );
   }

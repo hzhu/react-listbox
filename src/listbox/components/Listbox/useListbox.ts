@@ -45,13 +45,19 @@ export type ReducerType = (
   action: ListboxActionTypes
 ) => IListboxState;
 
+export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
+  index: number;
+  value: string;
+}
+
 export interface IUseListboxReturnValue {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
-  onFocus: (e: FocusEvent<HTMLUListElement>) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLUListElement>) => void;
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
+  getListboxProps: (
+    props: HTMLProps<HTMLUListElement>
+  ) => HTMLProps<HTMLUListElement>;
 }
 
 export interface IUseListboxProps {
@@ -148,11 +154,6 @@ const useKeyDown = ({
   }
 };
 
-export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
-  index: number;
-  value: string;
-}
-
 export const useListbox: useListboxType = ({ onChange, onSelect }) => {
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -202,6 +203,20 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
     };
   };
 
+  const getListboxProps = ({
+    ref,
+    ...restProps
+  }: HTMLProps<HTMLUListElement>) => {
+    return {
+      ref,
+      onFocus,
+      onKeyDown,
+      tabIndex: 0,
+      role: "listbox",
+      ...restProps,
+    };
+  };
+
   return {
     state,
     dispatch,
@@ -209,5 +224,6 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
     onFocus,
     onKeyDown,
     getOptionProps,
+    getListboxProps,
   };
 };
