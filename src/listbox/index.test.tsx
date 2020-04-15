@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Listbox, ListboxOption } from "./";
@@ -17,6 +17,37 @@ describe("Listbox", () => {
 
     expect(listbox).toMatchSnapshot();
   });
+
+  test("forwards ref to the underlying listbox & option elements", () => {
+    const listboxRef = createRef<HTMLUListElement>();
+    const optionRef = createRef<HTMLLIElement>();
+    const { getByRole } = render(
+      <Listbox ref={listboxRef}>
+        <ListboxOption ref={optionRef} value="tesla">
+          Tesla
+        </ListboxOption>
+      </Listbox>
+    );
+    expect(listboxRef.current).toBe(getByRole("listbox"));
+    expect(optionRef.current).toBe(getByRole("option"));
+  });
+
+  test("able to composes and call ListboxOption's onClick handler", () => {
+    const onClick = jest.fn();
+    const { getByText } = render(
+      <Listbox>
+        <ListboxOption value="tesla" onClick={onClick}>
+          Tesla
+        </ListboxOption>
+      </Listbox>
+    );
+    const tesla = getByText("Tesla");
+
+    fireEvent.click(tesla);
+
+    expect(onClick).toBeCalledTimes(1);
+  });
+
   describe("Uncontrolled", () => {
     test("selecting an option sets the correct aria-activedescendant and aria-selected", () => {
       const { getByRole, getByText } = render(
