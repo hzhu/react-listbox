@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Listbox, ListboxOption } from "./";
+import { withKnobs, boolean } from "@storybook/addon-knobs";
+import { Listbox, ListboxOption, SelectedValues } from "./";
 
 export default {
   title: "Listbox",
   component: Listbox,
+  decorators: [withKnobs],
 };
 
 const CAR_COMPANIES = [
@@ -27,18 +29,26 @@ const CAR_COMPANIES = [
 ];
 
 export const Uncontrolled = () => {
-  const [focusedOption, setFocusedOption] = useState<string>();
-  const [selectedOption, setSelectedOption] = useState<string>();
+  const [focusedValue, setFocusedValue] = useState<string>();
+  const [selectedValue, setSelectedValue] = useState<string | SelectedValues>(
+    {}
+  );
+  const label = "multiselect";
+  const defaultValue = false;
+  const multiselect = boolean(label, defaultValue);
 
   return (
     <Listbox
-      onChange={(option) => setFocusedOption(option)}
-      onSelect={(option) => setSelectedOption(option)}
+      multiselect={multiselect}
+      onChange={(value) => setFocusedValue(value)}
+      onSelect={(value) => setSelectedValue(value)}
     >
       {CAR_COMPANIES.map((car) => {
         const { name, value } = car;
-        const isFocused = value === focusedOption;
-        const isSelected = value === selectedOption;
+        const isFocused = value === focusedValue;
+        const isSelected = multiselect
+          ? selectedValue[value]
+          : value === selectedValue;
         const style = { background: isFocused ? "#96CCFF" : "" };
 
         return (

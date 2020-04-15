@@ -14,6 +14,7 @@ import { KEY_CODES } from "../../../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";
+export const MULTI_SELECT_OPTION = "multi select option";
 
 export interface IOption {
   id: string;
@@ -31,7 +32,17 @@ export interface ISelectOption {
   payload: IOption;
 }
 
-export type ListboxActionTypes = IFocusOption | ISelectOption;
+export interface IMultiSelectOption {
+  type: typeof MULTI_SELECT_OPTION;
+  payload: IOption;
+}
+
+export type ListboxActionTypes =
+  | IFocusOption
+  | ISelectOption
+  | IMultiSelectOption;
+
+export type SelectedValues = { [key: string]: boolean };
 
 export interface IListboxState {
   focusedId: string;
@@ -39,6 +50,7 @@ export interface IListboxState {
   focusedValue: string;
   selectedId: string;
   selectedValue: string;
+  selectedValues: SelectedValues;
 }
 
 export type ReducerType = (
@@ -60,7 +72,8 @@ export interface IUseListboxReturnValue {
 
 export interface IUseListboxProps {
   onChange?: (value: string) => void;
-  onSelect?: (value: string) => void;
+  onSelect?: (value: string | SelectedValues) => void;
+  multiselect?: boolean;
 }
 
 export interface IListenerProps extends IUseListboxProps {
@@ -92,6 +105,18 @@ const reducer: ReducerType = (state, action) => {
         focusedIndex: index,
         focusedValue: value,
       };
+    case MULTI_SELECT_OPTION:
+      const { selectedValues } = state;
+      return {
+        ...state,
+        selectedId: id,
+        focusedIndex: index,
+        focusedValue: value,
+        selectedValues: {
+          ...selectedValues,
+          [value]: !selectedValues[value],
+        },
+      };
     default:
       return state;
   }
@@ -103,18 +128,21 @@ const initialState = {
   selectedId: "",
   focusedValue: "",
   selectedValue: "",
+  selectedValues: {},
 };
 
 const handleFocus = ({
   state,
   dispatch,
   options,
-  onChange,
+  multiselect,
 }: IListenerProps) => (e: FocusEvent<HTMLUListElement>) => {
   if (state.focusedId === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
-    onChange && onChange(option.value);
+    if (!multiselect) {
+      dispatch({ type: SELECT_OPTION, payload: option });
+    }
   }
 };
 
@@ -122,8 +150,7 @@ const handleKeyDown = ({
   state,
   dispatch,
   options,
-  onChange,
-  onSelect,
+  multiselect,
 }: IListenerProps) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { focusedId, focusedIndex, focusedValue } = state;
@@ -133,16 +160,24 @@ const handleKeyDown = ({
       if (focusedIndex > 0) {
         const nextIndex = focusedIndex - 1;
         const option = options.current[nextIndex];
-        dispatch({ type: FOCUS_OPTION, payload: option });
-        onChange && onChange(option.value);
+        if (multiselect) {
+          dispatch({ type: FOCUS_OPTION, payload: option });
+        } else {
+          dispatch({ type: FOCUS_OPTION, payload: option });
+          dispatch({ type: SELECT_OPTION, payload: option });
+        }
       }
       break;
     case KEY_CODES.DOWN:
       if (focusedIndex !== options.current.length - 1) {
         const nextIndex = focusedIndex + 1;
         const option = options.current[nextIndex];
-        dispatch({ type: FOCUS_OPTION, payload: option });
-        onChange && onChange(option.value);
+        if (multiselect) {
+          dispatch({ type: FOCUS_OPTION, payload: option });
+        } else {
+          dispatch({ type: FOCUS_OPTION, payload: option });
+          dispatch({ type: SELECT_OPTION, payload: option });
+        }
       }
       break;
     case KEY_CODES.RETURN:
@@ -151,13 +186,20 @@ const handleKeyDown = ({
         index: focusedIndex,
         value: focusedValue,
       };
-      dispatch({ type: SELECT_OPTION, payload: option });
-      onSelect && onSelect(option.value);
+      if (multiselect) {
+        dispatch({ type: MULTI_SELECT_OPTION, payload: option });
+      } else {
+        dispatch({ type: SELECT_OPTION, payload: option });
+      }
       break;
   }
 };
 
-export const useListbox: useListboxType = ({ onChange, onSelect }) => {
+export const useListbox: useListboxType = ({
+  onChange,
+  onSelect,
+  multiselect,
+}) => {
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const listboxListenerProps = {
@@ -166,16 +208,32 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
     options,
     onChange,
     onSelect,
+    multiselect,
   };
+  const { focusedValue, selectedValue, selectedValues, selectedId } = state;
+
+  useEffect(() => {
+    if (multiselect) {
+      onSelect && onSelect(selectedValues);
+    } else {
+      onSelect && onSelect(selectedValue);
+    }
+  }, [selectedValues, selectedValue]);
+
+  useEffect(() => {
+    onChange && onChange(focusedValue);
+  }, [focusedValue]);
 
   const onFocus = handleFocus(listboxListenerProps);
   const onKeyDown = handleKeyDown(listboxListenerProps);
 
   const focusAndSelectOption = (index: number) => {
     const option = options.current[index];
-    onChange && onChange(option.value);
-    onSelect && onSelect(option.value);
-    dispatch({ type: SELECT_OPTION, payload: option });
+    if (multiselect) {
+      dispatch({ type: MULTI_SELECT_OPTION, payload: option });
+    } else {
+      dispatch({ type: SELECT_OPTION, payload: option });
+    }
   };
 
   const getOptionProps = ({
@@ -193,11 +251,15 @@ export const useListbox: useListboxType = ({ onChange, onSelect }) => {
       options.current[index] = option;
     }, [id, index, value]);
 
+    const ariaSelected = multiselect
+      ? selectedValues[value]
+      : id === selectedId;
+
     return {
       id,
       ref,
       role: "option",
-      "aria-selected": id === state.selectedId || undefined,
+      "aria-selected": ariaSelected,
       onClick: (event: MouseEvent<HTMLLIElement>) => {
         onClick && onClick(event);
         focusAndSelectOption(index);

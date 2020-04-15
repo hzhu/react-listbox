@@ -6,13 +6,15 @@ import { useListbox } from "./useListbox";
 export interface IListboxProps
   extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect"> {
   onChange?: (value: string) => void;
-  onSelect?: (value: string) => void;
+  onSelect?: (value: string | { [key: string]: boolean }) => void;
+  multiselect?: boolean;
 }
 
 export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
   (props, ref) => {
-    const { onChange, onSelect, children, ...restProps } = props;
+    const { multiselect, onChange, onSelect, children, ...restProps } = props;
     const { getOptionProps, getListboxProps } = useListbox({
+      multiselect,
       onChange,
       onSelect,
     });

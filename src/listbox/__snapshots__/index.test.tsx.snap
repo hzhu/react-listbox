@@ -6,18 +6,21 @@ exports[`Listbox renders a listbox (snapshot) 1`] = `
   tabindex="0"
 >
   <li
+    aria-selected="false"
     id="option--ford--1"
     role="option"
   >
     Ford
   </li>
   <li
+    aria-selected="false"
     id="option--tesla--2"
     role="option"
   >
     Tesla
   </li>
   <li
+    aria-selected="false"
     id="option--toyota--3"
     role="option"
   >
