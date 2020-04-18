@@ -179,7 +179,6 @@ describe("Listbox", () => {
       // Handlers called once on mount due to useEffect.
       expect(onChange).toBeCalledTimes(1);
       expect(onChange.mock.calls).toEqual([[""]]);
-      expect(onSelect).toBeCalledTimes(1);
 
       fireEvent.focus(listbox);
 
@@ -201,7 +200,7 @@ describe("Listbox", () => {
 
       expect(onChange).toBeCalledTimes(3);
       expect(onChange.mock.calls).toEqual([[""], ["ford"], ["tesla"]]);
-      expect(onSelect).toBeCalledTimes(3);
+      expect(onSelect).toBeCalledTimes(2);
       expect(onSelect).toHaveBeenCalledWith("tesla");
 
       fireEvent.keyDown(listbox, {
@@ -221,7 +220,7 @@ describe("Listbox", () => {
         ["tesla"],
         ["ford"],
       ]);
-      expect(onSelect).toBeCalledTimes(4);
+      expect(onSelect).toBeCalledTimes(3);
       expect(onSelect).toHaveBeenCalledWith("ford");
     });
 
@@ -306,13 +305,12 @@ describe("Listbox", () => {
 
       // Handlers called once on mount due to useEffect.
       expect(onChange).toBeCalledTimes(1);
-      expect(onSelect).toBeCalledTimes(1);
 
       fireEvent.click(tesla);
 
       expect(onChange).toBeCalledTimes(2);
       expect(onChange).toHaveBeenCalledWith("tesla");
-      expect(onSelect).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(1);
       expect(onSelect).toHaveBeenCalledWith("tesla");
     });
 

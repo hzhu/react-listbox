@@ -45,7 +45,6 @@ export type ListboxActionTypes =
 export type SelectedValues = { [key: string]: boolean };
 
 export interface IListboxState {
-  focusedId: string;
   focusedIndex: number;
   focusedValue: string;
   selectedId: string;
@@ -82,7 +81,7 @@ export interface IListenerProps extends IUseListboxProps {
   options: MutableRefObject<IOption[]>;
 }
 
-export type useListboxType = (
+export type UseListboxType = (
   props: IUseListboxProps
 ) => IUseListboxReturnValue;
 
@@ -93,7 +92,6 @@ const reducer: ReducerType = (state, action) => {
     case FOCUS_OPTION:
       return {
         ...state,
-        focusedId: id,
         focusedIndex: index,
         focusedValue: value,
       };
@@ -123,8 +121,7 @@ const reducer: ReducerType = (state, action) => {
 };
 
 const initialState = {
-  focusedId: "",
-  focusedIndex: 0,
+  focusedIndex: -1,
   selectedId: "",
   focusedValue: "",
   selectedValue: "",
@@ -137,7 +134,7 @@ const handleFocus = ({
   options,
   multiselect,
 }: IListenerProps) => (e: FocusEvent<HTMLUListElement>) => {
-  if (state.focusedId === "") {
+  if (state.focusedValue === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
     if (!multiselect) {
@@ -153,7 +150,7 @@ const handleKeyDown = ({
   multiselect,
 }: IListenerProps) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
-  const { focusedId, focusedIndex, focusedValue } = state;
+  const { focusedIndex } = state;
 
   switch (key) {
     case KEY_CODES.UP:
@@ -181,11 +178,7 @@ const handleKeyDown = ({
       }
       break;
     case KEY_CODES.RETURN:
-      const option = {
-        id: focusedId,
-        index: focusedIndex,
-        value: focusedValue,
-      };
+      const option = options.current[focusedIndex];
       if (multiselect) {
         dispatch({ type: MULTI_SELECT_OPTION, payload: option });
       } else {
@@ -195,7 +188,7 @@ const handleKeyDown = ({
   }
 };
 
-export const useListbox: useListboxType = ({
+export const useListbox: UseListboxType = ({
   onChange,
   onSelect,
   multiselect,
@@ -216,7 +209,7 @@ export const useListbox: useListboxType = ({
     if (multiselect) {
       onSelect && onSelect(selectedValues);
     } else {
-      onSelect && onSelect(selectedValue);
+      selectedValue && onSelect && onSelect(selectedValue);
     }
   }, [selectedValues, selectedValue]);
 
