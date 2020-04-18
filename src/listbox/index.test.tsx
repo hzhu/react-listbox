@@ -32,7 +32,33 @@ describe("Listbox", () => {
     expect(optionRef.current).toBe(getByRole("option"));
   });
 
-  test("able to composes and call ListboxOption's onClick handler", () => {
+  test("able to compose and call Listbox onFocus & onKeyDown handler", () => {
+    const onFocus = jest.fn();
+    const onKeyDown = jest.fn();
+    const { getByRole } = render(
+      <Listbox onFocus={onFocus} onKeyDown={onKeyDown}>
+        <ListboxOption value="tesla">Tesla</ListboxOption>
+      </Listbox>
+    );
+    const listbox = getByRole("listbox");
+
+    expect(onFocus).toBeCalledTimes(0);
+
+    fireEvent.focus(listbox);
+
+    expect(onFocus).toBeCalledTimes(1);
+
+    expect(onKeyDown).toBeCalledTimes(0);
+
+    fireEvent.keyDown(listbox, {
+      keyCode: KEY_CODES.DOWN,
+      which: KEY_CODES.DOWN,
+    });
+
+    expect(onKeyDown).toBeCalledTimes(1);
+  });
+
+  test("able to compose and call ListboxOption onClick handler", () => {
     const onClick = jest.fn();
     const { getByText } = render(
       <Listbox>
@@ -42,6 +68,8 @@ describe("Listbox", () => {
       </Listbox>
     );
     const tesla = getByText("Tesla");
+
+    expect(onClick).toBeCalledTimes(0);
 
     fireEvent.click(tesla);
 

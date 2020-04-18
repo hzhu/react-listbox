@@ -4,13 +4,12 @@ import {
   useReducer,
   Dispatch,
   FocusEvent,
-  MouseEvent,
   KeyboardEvent,
   MutableRefObject,
   HTMLProps,
 } from "react";
 import { useId } from "@reach/auto-id";
-import { KEY_CODES } from "../../../utils";
+import { composeEventHandlers, KEY_CODES } from "../../../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";
@@ -128,6 +127,18 @@ const initialState = {
   selectedValues: {},
 };
 
+const handleClick = (
+  { dispatch, options, multiselect }: IListenerProps,
+  index: number
+) => (e: FocusEvent<HTMLUListElement>) => {
+  const option = options.current[index];
+  if (multiselect) {
+    dispatch({ type: MULTI_SELECT_OPTION, payload: option });
+  } else {
+    dispatch({ type: SELECT_OPTION, payload: option });
+  }
+};
+
 const handleFocus = ({
   state,
   dispatch,
@@ -195,7 +206,7 @@ export const useListbox: UseListboxType = ({
 }) => {
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-  const listboxListenerProps = {
+  const listenerProps = {
     state,
     dispatch,
     options,
@@ -216,18 +227,6 @@ export const useListbox: UseListboxType = ({
   useEffect(() => {
     onChange && onChange(focusedValue);
   }, [focusedValue]);
-
-  const onFocus = handleFocus(listboxListenerProps);
-  const onKeyDown = handleKeyDown(listboxListenerProps);
-
-  const focusAndSelectOption = (index: number) => {
-    const option = options.current[index];
-    if (multiselect) {
-      dispatch({ type: MULTI_SELECT_OPTION, payload: option });
-    } else {
-      dispatch({ type: SELECT_OPTION, payload: option });
-    }
-  };
 
   const getOptionProps = ({
     ref,
@@ -253,24 +252,23 @@ export const useListbox: UseListboxType = ({
       ref,
       role: "option",
       "aria-selected": ariaSelected,
-      onClick: (event: MouseEvent<HTMLLIElement>) => {
-        onClick && onClick(event);
-        focusAndSelectOption(index);
-      },
+      onClick: composeEventHandlers(onClick, handleClick(listenerProps, index)),
       ...restProps,
     };
   };
 
   const getListboxProps = ({
     ref,
+    onFocus,
+    onKeyDown,
     ...restProps
   }: HTMLProps<HTMLUListElement>) => ({
     ref,
-    onFocus,
-    onKeyDown,
     tabIndex: 0,
     role: "listbox",
     "aria-activedescendant": state.selectedId || undefined,
+    onFocus: composeEventHandlers(onFocus, handleFocus(listenerProps)),
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown(listenerProps)),
     ...restProps,
   });
 
