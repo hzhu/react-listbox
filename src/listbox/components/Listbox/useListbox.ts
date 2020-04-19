@@ -9,7 +9,11 @@ import {
   HTMLProps,
 } from "react";
 import { useId } from "@reach/auto-id";
-import { composeEventHandlers, KEY_CODES } from "../../../utils";
+import {
+  KEY_CODES,
+  useDidMountEffect,
+  composeEventHandlers,
+} from "../../../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";
@@ -41,12 +45,14 @@ export type ListboxActionTypes =
   | ISelectOption
   | IMultiSelectOption;
 
-export type SelectedValues = { [key: string]: boolean };
+export type SelectedValues = { [key: string]: IOption };
 
 export interface IListboxState {
+  focusedId: string;
   focusedIndex: number;
   focusedValue: string;
   selectedId: string;
+  selectedIndex: number;
   selectedValue: string;
   selectedValues: SelectedValues;
 }
@@ -69,8 +75,8 @@ export interface IUseListboxReturnValue {
 }
 
 export interface IUseListboxProps {
-  onChange?: (value: string) => void;
-  onSelect?: (value: string | SelectedValues) => void;
+  onChange?: (option: IOption) => void;
+  onSelect?: (value: IOption | SelectedValues) => void;
   multiselect?: boolean;
 }
 
@@ -91,6 +97,7 @@ const reducer: ReducerType = (state, action) => {
     case FOCUS_OPTION:
       return {
         ...state,
+        focusedId: id,
         focusedIndex: index,
         focusedValue: value,
       };
@@ -98,21 +105,27 @@ const reducer: ReducerType = (state, action) => {
       return {
         ...state,
         selectedId: id,
+        selectedIndex: index,
         selectedValue: value,
-        focusedIndex: index,
-        focusedValue: value,
       };
     case MULTI_SELECT_OPTION:
       const { selectedValues } = state;
+      const option = { id, index, value };
+      let nextSelectedValues = {
+        ...selectedValues,
+        [value]: option,
+      };
+
+      if (selectedValues[value]) {
+        const { [value]: _, ...restSelectedValues } = nextSelectedValues;
+        nextSelectedValues = restSelectedValues;
+      }
+
       return {
         ...state,
         selectedId: id,
-        focusedIndex: index,
-        focusedValue: value,
-        selectedValues: {
-          ...selectedValues,
-          [value]: !selectedValues[value],
-        },
+        selectedIndex: index,
+        selectedValues: nextSelectedValues,
       };
     default:
       return state;
@@ -120,9 +133,11 @@ const reducer: ReducerType = (state, action) => {
 };
 
 const initialState = {
+  focusedId: "",
   focusedIndex: -1,
-  selectedId: "",
   focusedValue: "",
+  selectedId: "",
+  selectedIndex: -1,
   selectedValue: "",
   selectedValues: {},
 };
@@ -132,6 +147,7 @@ const handleClick = (
   index: number
 ) => (e: FocusEvent<HTMLUListElement>) => {
   const option = options.current[index];
+  dispatch({ type: FOCUS_OPTION, payload: option });
   if (multiselect) {
     dispatch({ type: MULTI_SELECT_OPTION, payload: option });
   } else {
@@ -190,6 +206,7 @@ const handleKeyDown = ({
       break;
     case KEY_CODES.RETURN:
       const option = options.current[focusedIndex];
+      dispatch({ type: FOCUS_OPTION, payload: option });
       if (multiselect) {
         dispatch({ type: MULTI_SELECT_OPTION, payload: option });
       } else {
@@ -214,19 +231,31 @@ export const useListbox: UseListboxType = ({
     onSelect,
     multiselect,
   };
-  const { focusedValue, selectedValue, selectedValues, selectedId } = state;
+  const {
+    focusedIndex,
+    selectedId,
+    selectedIndex,
+    selectedValue,
+    selectedValues,
+  } = state;
 
-  useEffect(() => {
+  useDidMountEffect(() => {
     if (multiselect) {
       onSelect && onSelect(selectedValues);
     } else {
-      selectedValue && onSelect && onSelect(selectedValue);
+      const option = {
+        id: selectedId,
+        index: selectedIndex,
+        value: selectedValue,
+      };
+      onSelect && onSelect(option);
     }
   }, [selectedValues, selectedValue]);
 
-  useEffect(() => {
-    onChange && onChange(focusedValue);
-  }, [focusedValue]);
+  useDidMountEffect(() => {
+    const option = options.current[focusedIndex];
+    onChange && onChange(option);
+  }, [focusedIndex]);
 
   const getOptionProps = ({
     ref,
@@ -244,7 +273,7 @@ export const useListbox: UseListboxType = ({
     }, [id, index, value]);
 
     const ariaSelected = multiselect
-      ? selectedValues[value]
+      ? id === (selectedValues[value] && selectedValues[value].id)
       : id === selectedId;
 
     return {
@@ -266,7 +295,7 @@ export const useListbox: UseListboxType = ({
     ref,
     tabIndex: 0,
     role: "listbox",
-    "aria-activedescendant": state.selectedId || undefined,
+    "aria-activedescendant": state.focusedId || undefined,
     onFocus: composeEventHandlers(onFocus, handleFocus(listenerProps)),
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown(listenerProps)),
     ...restProps,

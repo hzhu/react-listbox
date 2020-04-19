@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
-import { Listbox, ListboxOption, SelectedValues } from "./";
+import { Listbox, ListboxOption, SelectedValues, IOption } from "./";
 
 export default {
   title: "Listbox",
@@ -29,26 +29,26 @@ const CAR_COMPANIES = [
 ];
 
 export const Uncontrolled = () => {
-  const [focusedValue, setFocusedValue] = useState<string>();
-  const [selectedValue, setSelectedValue] = useState<string | SelectedValues>(
-    {}
-  );
   const label = "multiselect";
   const defaultValue = false;
   const multiselect = boolean(label, defaultValue);
+  const [focusedOption, setFocusedOption] = useState<IOption | undefined>();
+  const [selectedOption, setSelectedOption] = useState<
+    IOption | SelectedValues
+  >({});
 
   return (
     <Listbox
       multiselect={multiselect}
-      onChange={(value) => setFocusedValue(value)}
-      onSelect={(value) => setSelectedValue(value)}
+      onChange={(option) => setFocusedOption(option)}
+      onSelect={(option) => setSelectedOption(option)}
     >
-      {CAR_COMPANIES.map((car) => {
+      {CAR_COMPANIES.map((car, index) => {
         const { name, value } = car;
-        const isFocused = value === focusedValue;
+        const isFocused = index === focusedOption?.index;
         const isSelected = multiselect
-          ? selectedValue[value]
-          : value === selectedValue;
+          ? value === selectedOption[value]?.value
+          : value === selectedOption.value;
         const style = { background: isFocused ? "#96CCFF" : "" };
 
         return (

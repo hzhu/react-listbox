@@ -1,4 +1,4 @@
-import { SyntheticEvent } from "react";
+import { useRef, useEffect, SyntheticEvent } from "react";
 
 export const KEY_CODES: Record<string, number> = {
   BACKSPACE: 8,
@@ -23,4 +23,16 @@ export const composeEventHandlers = (...handlers: Handlers) => (
   e: SyntheticEvent
 ) => {
   handlers.forEach((handler) => handler && handler(e));
+};
+
+export const useDidMountEffect = (func: Function, deps: any[]) => {
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    if (didMount.current) {
+      func();
+    } else {
+      didMount.current = true;
+    }
+  }, deps);
 };

@@ -119,37 +119,26 @@ describe("Listbox", () => {
         </Listbox>
       );
       const listbox = getByRole("listbox");
+      const ford = getByText("Ford");
       const tesla = getByText("Tesla");
       const toyota = getByText("Toyota");
 
+      expect(listbox).not.toHaveAttribute("aria-activedescendant");
       fireEvent.focus(listbox);
+      expect(listbox).toHaveAttribute("aria-activedescendant", ford.id);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.DOWN,
         which: KEY_CODES.DOWN,
       });
 
-      expect(listbox).not.toHaveAttribute("aria-activedescendant");
-
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
-      });
-
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
-
       fireEvent.click(toyota);
-
       expect(listbox).toHaveAttribute("aria-activedescendant", toyota.id);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.UP,
         which: KEY_CODES.UP,
-      });
-
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
       });
 
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
@@ -195,67 +184,55 @@ describe("Listbox", () => {
     test("single-select: calls the onChange & onSelect prop with option's value for keyboard selection", () => {
       const onChange = jest.fn();
       const onSelect = jest.fn();
-      const { getByRole } = render(
+      const { getByText, getByRole } = render(
         <Listbox onSelect={onSelect} onChange={onChange}>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
         </Listbox>
       );
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
       const listbox = getByRole("listbox");
+      const OPTIONS = {
+        ford: { id: ford.id, index: 0, value: "ford" },
+        tesla: { id: tesla.id, index: 1, value: "tesla" },
+      };
 
-      // Handlers called once on mount due to useEffect.
-      expect(onChange).toBeCalledTimes(1);
-      expect(onChange.mock.calls).toEqual([[""]]);
+      expect(onChange).toBeCalledTimes(0);
 
       fireEvent.focus(listbox);
 
-      expect(onChange).toBeCalledTimes(2);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"]]);
+      expect(onChange).toBeCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
+      expect(onSelect).toBeCalledTimes(1);
+      expect(onSelect).toHaveBeenCalledWith(OPTIONS.ford);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.DOWN,
         which: KEY_CODES.DOWN,
       });
 
-      expect(onChange).toBeCalledTimes(3);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"], ["tesla"]]);
-
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
-      });
-
-      expect(onChange).toBeCalledTimes(3);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"], ["tesla"]]);
+      expect(onChange).toBeCalledTimes(2);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
       expect(onSelect).toBeCalledTimes(2);
-      expect(onSelect).toHaveBeenCalledWith("tesla");
+      expect(onSelect).toHaveBeenCalledWith(OPTIONS.tesla);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.UP,
         which: KEY_CODES.UP,
       });
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
-      });
-
-      expect(onChange).toBeCalledTimes(4);
-      expect(onChange.mock.calls).toEqual([
-        [""],
-        ["ford"],
-        ["tesla"],
-        ["ford"],
-      ]);
+      expect(onChange).toBeCalledTimes(3);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
       expect(onSelect).toBeCalledTimes(3);
-      expect(onSelect).toHaveBeenCalledWith("ford");
+      expect(onSelect).toHaveBeenCalledWith(OPTIONS.ford);
     });
 
     test("multi-select: calls the onChange & onSelect prop with correct arguments for keyboard selection", () => {
       const onChange = jest.fn();
       const onSelect = jest.fn();
-      const { getByRole } = render(
+      const { getByText, getByRole } = render(
         <Listbox multiselect onSelect={onSelect} onChange={onChange}>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
@@ -263,62 +240,58 @@ describe("Listbox", () => {
         </Listbox>
       );
       const listbox = getByRole("listbox");
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
+      const OPTIONS = {
+        ford: { id: ford.id, index: 0, value: "ford" },
+        tesla: { id: tesla.id, index: 1, value: "tesla" },
+      };
 
-      // Handlers called once on mount due to useEffect.
-      expect(onChange).toBeCalledTimes(1);
-      expect(onChange.mock.calls).toEqual([[""]]);
-      expect(onSelect).toBeCalledTimes(1);
+      expect(onChange).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(0);
 
       fireEvent.focus(listbox);
 
-      expect(onChange).toBeCalledTimes(2);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"]]);
+      expect(onChange).toBeCalledTimes(1);
+      expect(onSelect).toBeCalledTimes(0);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.DOWN,
         which: KEY_CODES.DOWN,
       });
 
-      expect(onChange).toBeCalledTimes(3);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"], ["tesla"]]);
+      expect(onChange).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(0);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.RETURN,
         which: KEY_CODES.RETURN,
       });
 
-      expect(onChange).toBeCalledTimes(3);
-      expect(onChange.mock.calls).toEqual([[""], ["ford"], ["tesla"]]);
-      expect(onSelect).toBeCalledTimes(2);
-      expect(onSelect).toHaveBeenCalledWith({ tesla: true });
+      expect(onChange).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
+      expect(onSelect).toHaveBeenCalledWith({ tesla: OPTIONS.tesla });
 
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.UP,
         which: KEY_CODES.UP,
       });
 
-      expect(onChange).toBeCalledTimes(4);
-      expect(onChange.mock.calls).toEqual([
-        [""],
-        ["ford"],
-        ["tesla"],
-        ["ford"],
-      ]);
-
       fireEvent.keyDown(listbox, {
         keyCode: KEY_CODES.RETURN,
         which: KEY_CODES.RETURN,
       });
 
-      expect(onChange).toBeCalledTimes(4);
-      expect(onChange.mock.calls).toEqual([
-        [""],
-        ["ford"],
-        ["tesla"],
-        ["ford"],
-      ]);
-      expect(onSelect).toBeCalledTimes(3);
-      expect(onSelect).toHaveBeenCalledWith({ tesla: true, ford: true });
+      expect(onChange).toBeCalledTimes(3);
+      expect(onSelect).toBeCalledTimes(2);
+      expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
+      expect(onSelect).toHaveBeenCalledWith({
+        tesla: OPTIONS.tesla,
+        ford: OPTIONS.ford,
+      });
     });
 
     test("single-select: calls the onChange & onSelect prop with option's value for click selection", () => {
@@ -330,16 +303,16 @@ describe("Listbox", () => {
         </Listbox>
       );
       const tesla = getByText("Tesla");
+      const TESLA_OPTION = { id: tesla.id, index: 0, value: "tesla" };
 
-      // Handlers called once on mount due to useEffect.
-      expect(onChange).toBeCalledTimes(1);
+      expect(onChange).toBeCalledTimes(0);
 
       fireEvent.click(tesla);
 
-      expect(onChange).toBeCalledTimes(2);
-      expect(onChange).toHaveBeenCalledWith("tesla");
+      expect(onChange).toBeCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(TESLA_OPTION);
       expect(onSelect).toBeCalledTimes(1);
-      expect(onSelect).toHaveBeenCalledWith("tesla");
+      expect(onSelect).toHaveBeenCalledWith(TESLA_OPTION);
     });
 
     test("multi-select: calls the onChange & onSelect prop with correct argumentsguments for click selection", () => {
@@ -353,16 +326,19 @@ describe("Listbox", () => {
       );
       const tesla = getByText("Tesla");
       const toyota = getByText("Toyota");
+      const SELECTED_OPTIONS = {
+        tesla: { id: tesla.id, index: 0, value: "tesla" },
+        toyota: { id: toyota.id, index: 1, value: "toyota" },
+      };
 
-      // Handlers called once on mount due to useEffect.
-      expect(onChange).toBeCalledTimes(1);
-      expect(onSelect).toBeCalledTimes(1);
+      expect(onChange).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(0);
 
       fireEvent.click(tesla);
       fireEvent.click(toyota);
 
-      expect(onSelect).toHaveBeenCalledWith({ tesla: true, toyota: true });
-      expect(onSelect).toBeCalledTimes(3);
+      expect(onSelect).toBeCalledTimes(2);
+      expect(onSelect).toHaveBeenCalledWith(SELECTED_OPTIONS);
     });
   });
 });

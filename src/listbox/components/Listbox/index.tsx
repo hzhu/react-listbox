@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
 import { ListboxContext } from "./useListboxContext";
-import { useListbox } from "./useListbox";
+import { useListbox, IOption } from "./useListbox";
 
 export interface IListboxProps
   extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect"> {
-  onChange?: (value: string) => void;
-  onSelect?: (value: string | { [key: string]: boolean }) => void;
+  onChange?: (option: IOption) => void;
+  onSelect?: (value: IOption | { [key: string]: IOption }) => void;
   multiselect?: boolean;
 }
 
