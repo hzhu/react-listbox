@@ -1,22 +1,30 @@
 import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
 import { ListboxContext } from "./useListboxContext";
-import { useListbox, IOption } from "./useListbox";
+import { useListbox, IUseListboxProps } from "./useListbox";
 
 export interface IListboxProps
-  extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect"> {
-  onChange?: (option: IOption) => void;
-  onSelect?: (value: IOption | { [key: string]: IOption }) => void;
-  multiselect?: boolean;
-}
+  extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect">,
+    IUseListboxProps {}
 
 export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
   (props, ref) => {
-    const { multiselect, onChange, onSelect, children, ...restProps } = props;
+    const {
+      onChange,
+      onSelect,
+      multiselect,
+      focusedIndex,
+      selectedIndex,
+      children,
+      ...restProps
+    } = props;
+
     const { getOptionProps, getListboxProps } = useListbox({
       multiselect,
       onChange,
       onSelect,
+      focusedIndex,
+      selectedIndex,
     });
     const currentIndexRef = useRef(0);
 
@@ -37,4 +45,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
 Listbox.propTypes = {
   onChange: PropTypes.func,
   onSelect: PropTypes.func,
+  multiselect: PropTypes.bool,
+  focusedIndex: PropTypes.number,
+  selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.array]),
 };

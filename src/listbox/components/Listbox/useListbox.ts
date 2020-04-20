@@ -47,6 +47,11 @@ export type ListboxActionTypes =
 
 export type SelectedValues = { [key: string]: IOption };
 
+export interface IControlledListboxState {
+  focusedIndex?: number;
+  selectedIndex?: number | number[];
+}
+
 export interface IListboxState {
   focusedId: string;
   focusedIndex: number;
@@ -78,9 +83,16 @@ export interface IUseListboxProps {
   onChange?: (option: IOption) => void;
   onSelect?: (value: IOption | SelectedValues) => void;
   multiselect?: boolean;
+  focusedIndex?: number;
+  selectedIndex?: number | number[];
 }
 
-export interface IListenerProps extends IUseListboxProps {
+export interface IControlledHandlerArgs extends IUseListboxProps {
+  state: IControlledListboxState;
+  options: MutableRefObject<IOption[]>;
+}
+
+export interface IHandlerArg extends IUseListboxProps {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
@@ -143,7 +155,7 @@ const initialState = {
 };
 
 const handleClick = (
-  { dispatch, options, multiselect }: IListenerProps,
+  { dispatch, options, multiselect }: IHandlerArg,
   index: number
 ) => (e: FocusEvent<HTMLUListElement>) => {
   const option = options.current[index];
@@ -155,12 +167,21 @@ const handleClick = (
   }
 };
 
+const handleClickControlled = (
+  { options, onChange, onSelect }: IControlledHandlerArgs,
+  index: number
+) => (e: FocusEvent<HTMLUListElement>) => {
+  const option = options.current[index];
+  onChange && onChange(option);
+  onSelect && onSelect(option);
+};
+
 const handleFocus = ({
   state,
   dispatch,
   options,
   multiselect,
-}: IListenerProps) => (e: FocusEvent<HTMLUListElement>) => {
+}: IHandlerArg) => (e: FocusEvent<HTMLUListElement>) => {
   if (state.focusedValue === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
@@ -170,12 +191,45 @@ const handleFocus = ({
   }
 };
 
+const handleKeyDownControlled = ({
+  state,
+  options,
+  onChange,
+  onSelect,
+}: IControlledHandlerArgs) => (e: KeyboardEvent<HTMLUListElement>) => {
+  const key = e.which || e.keyCode;
+  const { focusedIndex } = state;
+
+  if (focusedIndex === undefined) return;
+
+  switch (key) {
+    case KEY_CODES.UP:
+      if (focusedIndex > 0) {
+        const nextIndex = focusedIndex - 1;
+        const option = options.current[nextIndex];
+        onChange && onChange(option);
+      }
+      break;
+    case KEY_CODES.DOWN:
+      if (focusedIndex !== options.current.length - 1) {
+        const nextIndex = focusedIndex + 1;
+        const option = options.current[nextIndex];
+        onChange && onChange(option);
+      }
+      break;
+    case KEY_CODES.RETURN:
+      const option = options.current[focusedIndex];
+      onSelect && onSelect(option);
+      break;
+  }
+};
+
 const handleKeyDown = ({
   state,
   dispatch,
   options,
   multiselect,
-}: IListenerProps) => (e: KeyboardEvent<HTMLUListElement>) => {
+}: IHandlerArg) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { focusedIndex } = state;
 
@@ -220,10 +274,14 @@ export const useListbox: UseListboxType = ({
   onChange,
   onSelect,
   multiselect,
+  focusedIndex: controlledFocusedIndex,
+  selectedIndex: controlledSelectedIndex,
 }) => {
+  const isControlled =
+    controlledSelectedIndex != null || controlledFocusedIndex != null;
   const options = useRef<IOption[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-  const listenerProps = {
+  const handlerArgs = {
     state,
     dispatch,
     options,
@@ -231,6 +289,16 @@ export const useListbox: UseListboxType = ({
     onSelect,
     multiselect,
   };
+  const controlledHandlerArgs = {
+    state: {
+      focusedIndex: controlledFocusedIndex,
+      selectedIndex: controlledSelectedIndex,
+    },
+    options,
+    onChange,
+    onSelect,
+  };
+
   const {
     focusedIndex,
     selectedId,
@@ -281,7 +349,12 @@ export const useListbox: UseListboxType = ({
       ref,
       role: "option",
       "aria-selected": ariaSelected,
-      onClick: composeEventHandlers(onClick, handleClick(listenerProps, index)),
+      onClick: composeEventHandlers(
+        onClick,
+        isControlled
+          ? handleClickControlled(controlledHandlerArgs, index)
+          : handleClick(handlerArgs, index)
+      ),
       ...restProps,
     };
   };
@@ -296,8 +369,13 @@ export const useListbox: UseListboxType = ({
     tabIndex: 0,
     role: "listbox",
     "aria-activedescendant": state.focusedId || undefined,
-    onFocus: composeEventHandlers(onFocus, handleFocus(listenerProps)),
-    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown(listenerProps)),
+    onFocus: composeEventHandlers(onFocus, handleFocus(handlerArgs)),
+    onKeyDown: composeEventHandlers(
+      onKeyDown,
+      isControlled
+        ? handleKeyDownControlled(controlledHandlerArgs)
+        : handleKeyDown(handlerArgs)
+    ),
     ...restProps,
   });
 
