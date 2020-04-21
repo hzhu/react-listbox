@@ -4,6 +4,12 @@ import "@testing-library/jest-dom/extend-expect";
 import { Listbox, ListboxOption } from "./";
 import { KEY_CODES } from "../utils";
 
+export const KEY_EVENTS = {
+  ARROW_UP: { keyCode: KEY_CODES.UP, which: KEY_CODES.UP },
+  ARROW_DOWN: { keyCode: KEY_CODES.DOWN, which: KEY_CODES.DOWN },
+  RETURN: { keyCode: KEY_CODES.RETURN, which: KEY_CODES.RETURN },
+};
+
 describe("Listbox", () => {
   test("renders a listbox (snapshot)", () => {
     const { getByRole } = render(
@@ -43,18 +49,12 @@ describe("Listbox", () => {
     const listbox = getByRole("listbox");
 
     expect(onFocus).toBeCalledTimes(0);
-
     fireEvent.focus(listbox);
 
     expect(onFocus).toBeCalledTimes(1);
-
     expect(onKeyDown).toBeCalledTimes(0);
 
-    fireEvent.keyDown(listbox, {
-      keyCode: KEY_CODES.DOWN,
-      which: KEY_CODES.DOWN,
-    });
-
+    fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
     expect(onKeyDown).toBeCalledTimes(1);
   });
 
@@ -72,11 +72,10 @@ describe("Listbox", () => {
     expect(onClick).toBeCalledTimes(0);
 
     fireEvent.click(tesla);
-
     expect(onClick).toBeCalledTimes(1);
   });
 
-  describe("Uncontrolled", () => {
+  describe("Uncontrolled Usage", () => {
     test("single-select: selecting an option sets the correct aria-activedescendant", () => {
       const { getByRole, getByText } = render(
         <Listbox>
@@ -92,21 +91,12 @@ describe("Listbox", () => {
       expect(listbox).not.toHaveAttribute("aria-activedescendant");
 
       fireEvent.focus(listbox);
-
       expect(listbox).toHaveAttribute("aria-activedescendant", ford.id);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.DOWN,
-        which: KEY_CODES.DOWN,
-      });
-
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.UP,
-        which: KEY_CODES.UP,
-      });
-
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
       expect(listbox).toHaveAttribute("aria-activedescendant", ford.id);
     });
 
@@ -124,23 +114,17 @@ describe("Listbox", () => {
       const toyota = getByText("Toyota");
 
       expect(listbox).not.toHaveAttribute("aria-activedescendant");
+
       fireEvent.focus(listbox);
       expect(listbox).toHaveAttribute("aria-activedescendant", ford.id);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.DOWN,
-        which: KEY_CODES.DOWN,
-      });
-
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+
       fireEvent.click(toyota);
       expect(listbox).toHaveAttribute("aria-activedescendant", toyota.id);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.UP,
-        which: KEY_CODES.UP,
-      });
-
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
     });
 
@@ -208,20 +192,14 @@ describe("Listbox", () => {
       expect(onSelect).toBeCalledTimes(1);
       expect(onSelect).toHaveBeenCalledWith(OPTIONS.ford);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.DOWN,
-        which: KEY_CODES.DOWN,
-      });
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
 
       expect(onChange).toBeCalledTimes(2);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
       expect(onSelect).toBeCalledTimes(2);
       expect(onSelect).toHaveBeenCalledWith(OPTIONS.tesla);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.UP,
-        which: KEY_CODES.UP,
-      });
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
 
       expect(onChange).toBeCalledTimes(3);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
@@ -256,34 +234,21 @@ describe("Listbox", () => {
       expect(onSelect).toBeCalledTimes(0);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.DOWN,
-        which: KEY_CODES.DOWN,
-      });
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
 
       expect(onChange).toBeCalledTimes(2);
       expect(onSelect).toBeCalledTimes(0);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
-      });
+      fireEvent.keyDown(listbox, KEY_EVENTS.RETURN);
 
       expect(onChange).toBeCalledTimes(2);
       expect(onSelect).toBeCalledTimes(1);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
       expect(onSelect).toHaveBeenCalledWith({ tesla: OPTIONS.tesla });
 
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.UP,
-        which: KEY_CODES.UP,
-      });
-
-      fireEvent.keyDown(listbox, {
-        keyCode: KEY_CODES.RETURN,
-        which: KEY_CODES.RETURN,
-      });
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
+      fireEvent.keyDown(listbox, KEY_EVENTS.RETURN);
 
       expect(onChange).toBeCalledTimes(3);
       expect(onSelect).toBeCalledTimes(2);
@@ -339,6 +304,113 @@ describe("Listbox", () => {
 
       expect(onSelect).toBeCalledTimes(2);
       expect(onSelect).toHaveBeenCalledWith(SELECTED_OPTIONS);
+    });
+  });
+
+  describe("Controlled Usage", () => {
+    test("calls onChange with the correct option on keyboard selection", () => {
+      const onChange = jest.fn();
+      const controlledIndex = 1;
+      const { getByText, getByRole } = render(
+        <Listbox focusedIndex={controlledIndex} onChange={onChange}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const toyota = getByText("Toyota");
+      const ford = getByText("Ford");
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith({
+        id: toyota.id,
+        index: controlledIndex + 1,
+        value: "toyota",
+      });
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
+
+      expect(onChange).toHaveBeenCalledTimes(2);
+      expect(onChange).toHaveBeenCalledWith({
+        id: ford.id,
+        index: controlledIndex - 1,
+        value: "ford",
+      });
+    });
+
+    test("calls onChange with the correct option on pointer selection", () => {
+      const onChange = jest.fn();
+      const { getByText } = render(
+        <Listbox focusedIndex={0} onChange={onChange}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
+      const toyota = getByText("Toyota");
+      const OPTIONS_BY_ID = {
+        [ford.id]: { id: ford.id, index: 0, value: "ford" },
+        [tesla.id]: { id: tesla.id, index: 1, value: "tesla" },
+        [toyota.id]: { id: toyota.id, index: 2, value: "toyota" },
+      };
+
+      [toyota, tesla, ford].forEach((option) => {
+        fireEvent.click(option);
+        expect(onChange).toHaveBeenCalledWith(OPTIONS_BY_ID[option.id]);
+      });
+    });
+
+    test("calls onSelect with the correct option on keyboard selection", () => {
+      const onSelect = jest.fn();
+      const controlledFocusedIndex = 1;
+      const { getByText, getByRole } = render(
+        <Listbox focusedIndex={controlledFocusedIndex} onSelect={onSelect}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const tesla = getByText("Tesla");
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.RETURN);
+
+      expect(onSelect).toBeCalledTimes(1);
+      expect(onSelect).toBeCalledWith({
+        id: tesla.id,
+        index: controlledFocusedIndex,
+        value: "tesla",
+      });
+    });
+
+    test("calls onSelect with the correct option on pointer selection", () => {
+      const onSelect = jest.fn();
+      const controlledFocusedIndex = 1;
+      const { getByText } = render(
+        <Listbox focusedIndex={controlledFocusedIndex} onSelect={onSelect}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
+      const toyota = getByText("Toyota");
+      const OPTIONS_BY_ID = {
+        [ford.id]: { id: ford.id, index: 0, value: "ford" },
+        [tesla.id]: { id: tesla.id, index: 1, value: "tesla" },
+        [toyota.id]: { id: toyota.id, index: 2, value: "toyota" },
+      };
+
+      [ford, tesla, toyota].forEach((option) => {
+        fireEvent.click(option);
+        expect(onSelect).toBeCalledWith(OPTIONS_BY_ID[option.id]);
+      });
     });
   });
 });
