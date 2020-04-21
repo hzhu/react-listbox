@@ -10,11 +10,14 @@ export const ListboxContext = createContext<IListboxContext | undefined>(
   undefined
 );
 
+export const LISTBOX_CONTEXT_ERROR =
+  "useListboxContext must be used within a ListboxProvider";
+
 export const useListboxContext = () => {
   const context = useContext(ListboxContext);
 
   if (context === undefined) {
-    throw new Error("useListboxContext must be used within a ListboxProvider");
+    throw new Error(LISTBOX_CONTEXT_ERROR);
   }
 
   return context;

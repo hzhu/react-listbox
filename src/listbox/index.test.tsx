@@ -2,6 +2,7 @@ import React, { createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Listbox, ListboxOption } from "./";
+import { LISTBOX_CONTEXT_ERROR } from "./components/Listbox/useListboxContext";
 import { KEY_CODES } from "../utils";
 
 export const KEY_EVENTS = {
@@ -22,6 +23,17 @@ describe("Listbox", () => {
     const listbox = getByRole("listbox");
 
     expect(listbox).toMatchSnapshot();
+  });
+
+  test("rendering listbox descendant components outside of context throws error", () => {
+    const error = console.error;
+    console.error = () => {};
+
+    expect(() =>
+      render(<ListboxOption value="tesla">Tesla</ListboxOption>)
+    ).toThrow(LISTBOX_CONTEXT_ERROR);
+
+    console.error = error;
   });
 
   test("forwards ref to the underlying listbox & option elements", () => {

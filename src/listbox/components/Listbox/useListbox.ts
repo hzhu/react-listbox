@@ -263,8 +263,6 @@ const handleKeyDown = ({
       dispatch({ type: FOCUS_OPTION, payload: option });
       if (multiselect) {
         dispatch({ type: MULTI_SELECT_OPTION, payload: option });
-      } else {
-        dispatch({ type: SELECT_OPTION, payload: option });
       }
       break;
   }
