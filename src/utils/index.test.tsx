@@ -1,6 +1,5 @@
-import React, { useState, SyntheticEvent } from "react";
-import { render, fireEvent } from "@testing-library/react";
-import { composeEventHandlers, useDidMountEffect } from "./index";
+import { SyntheticEvent } from "react";
+import { composeEventHandlers } from "./index";
 
 describe("utils", () => {
   test("composeEventHandlers: composes event handlers", () => {
@@ -16,21 +15,5 @@ describe("utils", () => {
       expect(handler).toBeCalledTimes(1);
       expect(handler).toHaveBeenCalledWith(event);
     });
-  });
-
-  test("useDidMountEffect: runs effect after mount, only when dependency changes", () => {
-    const effect = jest.fn();
-    const Basic = () => {
-      const [count, setCount] = useState(0);
-      const increment = () => setCount(count + 1);
-      useDidMountEffect(effect, [count]);
-
-      return <button onClick={increment}>click</button>;
-    };
-    const { getByRole } = render(<Basic />);
-
-    expect(effect).toBeCalledTimes(0);
-    fireEvent.click(getByRole("button"));
-    expect(effect).toBeCalledTimes(1);
   });
 });

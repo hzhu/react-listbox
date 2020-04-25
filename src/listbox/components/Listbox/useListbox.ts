@@ -1,5 +1,6 @@
 import {
   useRef,
+  useEffect,
   useReducer,
   Dispatch,
   FocusEvent,
@@ -7,11 +8,7 @@ import {
   MutableRefObject,
   HTMLProps,
 } from "react";
-import {
-  KEY_CODES,
-  useDidMountEffect,
-  composeEventHandlers,
-} from "../../../utils";
+import { KEY_CODES, composeEventHandlers } from "../../../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";
@@ -303,23 +300,30 @@ export const useListbox: UseListboxType = ({
     selectedValues,
   } = state;
 
-  useDidMountEffect(() => {
-    if (multiselect) {
-      onSelect && onSelect(selectedValues);
-    } else {
-      const option = {
-        id: selectedId,
-        index: selectedIndex,
-        value: selectedValue,
-      };
-      onSelect && onSelect(option);
+  useEffect(() => {
+    if (isControlled === false) {
+      if (multiselect) {
+        onSelect && onSelect(selectedValues);
+      } else {
+        const option = options.current[selectedIndex];
+        option && onSelect && onSelect(option);
+      }
     }
-  }, [selectedValues, selectedValue]);
+  }, [
+    onSelect,
+    multiselect,
+    selectedIndex,
+    selectedValues,
+    selectedValue,
+    isControlled,
+  ]);
 
-  useDidMountEffect(() => {
-    const option = options.current[focusedIndex];
-    onChange && onChange(option);
-  }, [focusedIndex]);
+  useEffect(() => {
+    if (isControlled === false) {
+      const option = options.current[focusedIndex];
+      option && onChange && onChange(option);
+    }
+  }, [onChange, focusedIndex, isControlled]);
 
   const getOptionProps = ({
     id,

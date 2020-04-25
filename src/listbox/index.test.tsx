@@ -238,24 +238,24 @@ describe("Listbox", () => {
       };
 
       expect(onChange).toBeCalledTimes(0);
-      expect(onSelect).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(1);
 
       fireEvent.focus(listbox);
 
       expect(onChange).toBeCalledTimes(1);
-      expect(onSelect).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(1);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
 
       fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
 
       expect(onChange).toBeCalledTimes(2);
-      expect(onSelect).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(1);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
 
       fireEvent.keyDown(listbox, KEY_EVENTS.RETURN);
 
       expect(onChange).toBeCalledTimes(2);
-      expect(onSelect).toBeCalledTimes(1);
+      expect(onSelect).toBeCalledTimes(2);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.tesla);
       expect(onSelect).toHaveBeenCalledWith({ tesla: OPTIONS.tesla });
 
@@ -263,7 +263,7 @@ describe("Listbox", () => {
       fireEvent.keyDown(listbox, KEY_EVENTS.RETURN);
 
       expect(onChange).toBeCalledTimes(3);
-      expect(onSelect).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(3);
       expect(onChange).toHaveBeenCalledWith(OPTIONS.ford);
       expect(onSelect).toHaveBeenCalledWith({
         tesla: OPTIONS.tesla,
@@ -309,12 +309,12 @@ describe("Listbox", () => {
       };
 
       expect(onChange).toBeCalledTimes(0);
-      expect(onSelect).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(1);
 
       fireEvent.click(tesla);
       fireEvent.click(toyota);
 
-      expect(onSelect).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledTimes(3);
       expect(onSelect).toHaveBeenCalledWith(SELECTED_OPTIONS);
     });
   });
@@ -333,6 +333,8 @@ describe("Listbox", () => {
       const listbox = getByRole("listbox");
       const toyota = getByText("Toyota");
       const ford = getByText("Ford");
+
+      expect(onChange).toHaveBeenCalledTimes(0);
 
       fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
 import { Listbox, ListboxOption, SelectedValues, IOption } from "./";
 
@@ -36,13 +36,11 @@ export const Uncontrolled = () => {
   const [selectedOption, setSelectedOption] = useState<
     IOption | SelectedValues
   >({});
+  const onChange = useCallback((option) => setFocusedOption(option), []);
+  const onSelect = useCallback((option) => setSelectedOption(option), []);
 
   return (
-    <Listbox
-      multiselect={multiselect}
-      onChange={(option) => setFocusedOption(option)}
-      onSelect={(option) => setSelectedOption(option)}
-    >
+    <Listbox multiselect={multiselect} onChange={onChange} onSelect={onSelect}>
       {CAR_COMPANIES.map((car, index) => {
         const { name, value } = car;
         const isFocused = index === focusedOption?.index;
