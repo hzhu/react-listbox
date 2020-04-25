@@ -1,6 +1,5 @@
 import {
   useRef,
-  useEffect,
   useReducer,
   Dispatch,
   FocusEvent,
@@ -8,7 +7,6 @@ import {
   MutableRefObject,
   HTMLProps,
 } from "react";
-import { useId } from "@reach/auto-id";
 import {
   KEY_CODES,
   useDidMountEffect,
@@ -324,19 +322,17 @@ export const useListbox: UseListboxType = ({
   }, [focusedIndex]);
 
   const getOptionProps = ({
+    id,
     ref,
     index,
     value,
     onClick,
     ...restProps
   }: IGetOptionProps): HTMLProps<HTMLLIElement> => {
-    const stableId = useId();
-    const id = `option--${value}--${stableId}`;
-
-    useEffect(() => {
+    if (id && !options.current[index]) {
       const option = { id, index, value };
       options.current[index] = option;
-    }, [id, index, value]);
+    }
 
     const ariaSelected = multiselect
       ? id === (selectedValues[value] && selectedValues[value].id)
