@@ -195,7 +195,9 @@ const handleKeyDownControlled = ({
   const key = e.which || e.keyCode;
   const { focusedIndex } = state;
 
-  if (focusedIndex === undefined) return;
+  if (focusedIndex === undefined || focusedIndex < 0) return;
+
+  e.preventDefault();
 
   switch (key) {
     case KEY_CODES.UP:
@@ -227,6 +229,8 @@ const handleKeyDown = ({
 }: IHandlerArg) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { focusedIndex } = state;
+
+  e.preventDefault();
 
   switch (key) {
     case KEY_CODES.UP:

@@ -2,12 +2,6 @@ import React, { useState, useCallback } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
 import { Listbox, ListboxOption, SelectedValues, IOption } from "./";
 
-export default {
-  title: "Listbox",
-  component: Listbox,
-  decorators: [withKnobs],
-};
-
 const CAR_COMPANIES = [
   { name: "BMW Group", value: "bmw" },
   { name: "Daimler AG", value: "daimlier" },
@@ -141,4 +135,35 @@ export const Controlled = () => {
       </Listbox>
     </>
   );
+};
+
+Uncontrolled.story = {
+  parameters: {
+    docs: {
+      storyDescription: `An [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _state_, while a
+      controlled component is driven by _props_. This listbox component's behavior is driven by internal state, and demonstrates uncontrolled single-select
+      behavior. The component accepts a \`multiSelect\` prop which toggles on multi-select behavior.`,
+    },
+  },
+};
+
+Controlled.story = {
+  parameters: {
+    docs: {
+      storyDescription: `A [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _props_, while an
+      uncontrolled component is driven by _state_. This listbox component's behavior is driven by props, and demonstrates custom behavior such
+      as "Select All" and "Deselect All".`,
+    },
+  },
+};
+
+export default {
+  title: "Listbox",
+  decorators: [withKnobs],
+  component: Listbox,
+  subcomponents: { ListboxOption },
+  parameters: {
+    componentSubtitle:
+      "A listbox widget presents a list of options and allows a user to select one or more of them.",
+  },
 };

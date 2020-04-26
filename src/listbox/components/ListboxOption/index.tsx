@@ -19,6 +19,7 @@ export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
 );
 
 ListboxOption.propTypes = {
+  /** A discrete value for the option. */
   value: PropTypes.string.isRequired,
 };
 
