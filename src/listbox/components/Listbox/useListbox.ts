@@ -77,7 +77,7 @@ export interface IUseListboxReturnValue {
 export interface IUseListboxProps {
   onChange?: (option: IOption) => void;
   onSelect?: (value: IOption | SelectedValues) => void;
-  multiselect?: boolean;
+  multiSelect?: boolean;
   focusedIndex?: number;
   selectedIndex?: number | number[];
 }
@@ -150,12 +150,12 @@ const initialState = {
 };
 
 const handleClick = (
-  { dispatch, options, multiselect }: IHandlerArg,
+  { dispatch, options, multiSelect }: IHandlerArg,
   index: number
 ) => (e: FocusEvent<HTMLUListElement>) => {
   const option = options.current[index];
   dispatch({ type: FOCUS_OPTION, payload: option });
-  if (multiselect) {
+  if (multiSelect) {
     dispatch({ type: MULTI_SELECT_OPTION, payload: option });
   } else {
     dispatch({ type: SELECT_OPTION, payload: option });
@@ -175,12 +175,12 @@ const handleFocus = ({
   state,
   dispatch,
   options,
-  multiselect,
+  multiSelect,
 }: IHandlerArg) => (e: FocusEvent<HTMLUListElement>) => {
   if (state.focusedValue === "") {
     const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
-    if (!multiselect) {
+    if (!multiSelect) {
       dispatch({ type: SELECT_OPTION, payload: option });
     }
   }
@@ -223,7 +223,7 @@ const handleKeyDown = ({
   state,
   dispatch,
   options,
-  multiselect,
+  multiSelect,
 }: IHandlerArg) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { focusedIndex } = state;
@@ -233,7 +233,7 @@ const handleKeyDown = ({
       if (focusedIndex > 0) {
         const nextIndex = focusedIndex - 1;
         const option = options.current[nextIndex];
-        if (multiselect) {
+        if (multiSelect) {
           dispatch({ type: FOCUS_OPTION, payload: option });
         } else {
           dispatch({ type: FOCUS_OPTION, payload: option });
@@ -245,7 +245,7 @@ const handleKeyDown = ({
       if (focusedIndex !== options.current.length - 1) {
         const nextIndex = focusedIndex + 1;
         const option = options.current[nextIndex];
-        if (multiselect) {
+        if (multiSelect) {
           dispatch({ type: FOCUS_OPTION, payload: option });
         } else {
           dispatch({ type: FOCUS_OPTION, payload: option });
@@ -256,7 +256,7 @@ const handleKeyDown = ({
     case KEY_CODES.RETURN:
       const option = options.current[focusedIndex];
       dispatch({ type: FOCUS_OPTION, payload: option });
-      if (multiselect) {
+      if (multiSelect) {
         dispatch({ type: MULTI_SELECT_OPTION, payload: option });
       }
       break;
@@ -266,7 +266,7 @@ const handleKeyDown = ({
 export const useListbox: UseListboxType = ({
   onChange,
   onSelect,
-  multiselect,
+  multiSelect,
   focusedIndex: controlledFocusedIndex,
   selectedIndex: controlledSelectedIndex,
 }) => {
@@ -280,7 +280,7 @@ export const useListbox: UseListboxType = ({
     options,
     onChange,
     onSelect,
-    multiselect,
+    multiSelect,
   };
   const controlledHandlerArgs = {
     state: {
@@ -302,7 +302,7 @@ export const useListbox: UseListboxType = ({
 
   useEffect(() => {
     if (isControlled === false) {
-      if (multiselect) {
+      if (multiSelect) {
         onSelect && onSelect(selectedValues);
       } else {
         const option = options.current[selectedIndex];
@@ -311,7 +311,7 @@ export const useListbox: UseListboxType = ({
     }
   }, [
     onSelect,
-    multiselect,
+    multiSelect,
     selectedIndex,
     selectedValues,
     selectedValue,
@@ -338,7 +338,7 @@ export const useListbox: UseListboxType = ({
       options.current[index] = option;
     }
 
-    const ariaSelected = multiselect
+    const ariaSelected = multiSelect
       ? id === (selectedValues[value] && selectedValues[value].id)
       : id === selectedId;
 

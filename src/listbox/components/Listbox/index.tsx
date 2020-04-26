@@ -12,7 +12,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
     const {
       onChange,
       onSelect,
-      multiselect,
+      multiSelect,
       focusedIndex,
       selectedIndex,
       children,
@@ -20,7 +20,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
     } = props;
 
     const { getOptionProps, getListboxProps } = useListbox({
-      multiselect,
+      multiSelect,
       onChange,
       onSelect,
       focusedIndex,
@@ -45,7 +45,9 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
 Listbox.propTypes = {
   onChange: PropTypes.func,
   onSelect: PropTypes.func,
-  multiselect: PropTypes.bool,
+  multiSelect: PropTypes.bool,
   focusedIndex: PropTypes.number,
   selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.array]),
 };
+
+Listbox.displayName = "Listbox";

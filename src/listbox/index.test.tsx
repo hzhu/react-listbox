@@ -114,7 +114,7 @@ describe("Listbox", () => {
 
     test("multi-select: selecting an option sets the correct aria-activedescendant", () => {
       const { getByRole, getByText } = render(
-        <Listbox multiselect>
+        <Listbox multiSelect>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
@@ -159,7 +159,7 @@ describe("Listbox", () => {
 
     test("multi-select: selects and deselects all options", () => {
       const { getAllByRole } = render(
-        <Listbox multiselect>
+        <Listbox multiSelect>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
@@ -223,7 +223,7 @@ describe("Listbox", () => {
       const onChange = jest.fn();
       const onSelect = jest.fn();
       const { getByText, getByRole } = render(
-        <Listbox multiselect onSelect={onSelect} onChange={onChange}>
+        <Listbox multiSelect onSelect={onSelect} onChange={onChange}>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
@@ -296,7 +296,7 @@ describe("Listbox", () => {
       const onChange = jest.fn();
       const onSelect = jest.fn();
       const { getByText } = render(
-        <Listbox multiselect onSelect={onSelect} onChange={onChange}>
+        <Listbox multiSelect onSelect={onSelect} onChange={onChange}>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
         </Listbox>

@@ -29,9 +29,9 @@ const CAR_COMPANIES = [
 ];
 
 export const Uncontrolled = () => {
-  const label = "multiselect";
+  const label = "multiSelect";
   const defaultValue = false;
-  const multiselect = boolean(label, defaultValue);
+  const multiSelect = boolean(label, defaultValue);
   const [focusedOption, setFocusedOption] = useState<IOption | undefined>();
   const [selectedOption, setSelectedOption] = useState<
     IOption | SelectedValues
@@ -40,11 +40,11 @@ export const Uncontrolled = () => {
   const onSelect = useCallback((option) => setSelectedOption(option), []);
 
   return (
-    <Listbox multiselect={multiselect} onChange={onChange} onSelect={onSelect}>
+    <Listbox multiSelect={multiSelect} onChange={onChange} onSelect={onSelect}>
       {CAR_COMPANIES.map((car, index) => {
         const { name, value } = car;
         const isFocused = index === focusedOption?.index;
-        const isSelected = multiselect
+        const isSelected = multiSelect
           ? value === selectedOption[value]?.value
           : value === selectedOption.value;
         const style = { background: isFocused ? "#96CCFF" : "" };

@@ -21,3 +21,5 @@ export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
 ListboxOption.propTypes = {
   value: PropTypes.string.isRequired,
 };
+
+ListboxOption.displayName = "ListboxOption";
