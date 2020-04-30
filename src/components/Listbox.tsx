@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
+import { useMergeRefs } from "../hooks/useMergeRefs";
 import { ListboxContext } from "../hooks/useListboxContext";
-import { useListbox, IUseListboxProps } from "../hooks/useListbox";
+import { useListbox, IListboxProps } from "../hooks/useListbox";
 
-export interface IListboxProps
+export interface IListboxPropsAttributes
   extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect">,
-    IUseListboxProps {}
+    IListboxProps {}
 
 // TODO: Not sure why addon-docs doesn't show PrimarySlot description, so it temporarily lives here.
 // Maybe remove this when https://github.com/storybookjs/storybook/pull/10180 is merged.
@@ -14,7 +15,7 @@ An [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f9
 controlled component is driven by _props_. This listbox component's behavior is driven by internal state, and demonstrates uncontrolled
 single-select behavior. The component accepts a `multiSelect` prop which toggles on multi-select behavior.
 **/
-export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
+export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
   (props, ref) => {
     const {
       onChange,
@@ -26,7 +27,10 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
       ...restProps
     } = props;
 
+    const listboxRef = useMergeRefs<HTMLUListElement>(ref);
+
     const { getOptionProps, getListboxProps } = useListbox({
+      listboxRef,
       multiSelect,
       onChange,
       onSelect,
@@ -43,7 +47,9 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxProps>(
 
     return (
       <ListboxContext.Provider value={value}>
-        <ul {...getListboxProps({ ref, ...restProps })}>{children}</ul>
+        <ul {...getListboxProps({ ref: listboxRef, ...restProps })}>
+          {children}
+        </ul>
       </ListboxContext.Provider>
     );
   }

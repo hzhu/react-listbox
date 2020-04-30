@@ -3,11 +3,13 @@ import {
   useEffect,
   useReducer,
   Dispatch,
+  RefObject,
   FocusEvent,
   KeyboardEvent,
   MutableRefObject,
   HTMLProps,
 } from "react";
+import { useFindItemToFocus } from "./useFindItemToFocus";
 import { KEY_CODES, composeEventHandlers } from "../utils";
 
 export const FOCUS_OPTION = "focus option";
@@ -67,14 +69,14 @@ export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
   value: string;
 }
 
+export interface IGetListboxProps extends HTMLProps<HTMLUListElement> {}
+
 export interface IUseListboxReturnValue {
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
-  getListboxProps: (
-    props: HTMLProps<HTMLUListElement>
-  ) => HTMLProps<HTMLUListElement>;
+  getListboxProps: (props: IGetListboxProps) => HTMLProps<HTMLUListElement>;
 }
 
-export interface IUseListboxProps {
+export interface IListboxProps {
   onChange?: (option: IOption) => void;
   onSelect?: (value: IOption | SelectedValues) => void;
   multiSelect?: boolean;
@@ -82,12 +84,16 @@ export interface IUseListboxProps {
   selectedIndex?: number | number[];
 }
 
-export interface IControlledHandlerArgs extends IUseListboxProps {
+export interface IUseListboxProps extends IListboxProps {
+  listboxRef: RefObject<HTMLUListElement>;
+}
+
+export interface IControlledHandlerArgs extends IListboxProps {
   state: IControlledListboxState;
   options: MutableRefObject<IOption[]>;
 }
 
-export interface IHandlerArg extends IUseListboxProps {
+export interface IHandlerArg extends IListboxProps {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
@@ -271,6 +277,7 @@ export const useListbox: UseListboxType = ({
   onChange,
   onSelect,
   multiSelect,
+  listboxRef,
   focusedIndex: controlledFocusedIndex,
   selectedIndex: controlledSelectedIndex,
 }) => {
@@ -329,6 +336,12 @@ export const useListbox: UseListboxType = ({
     }
   }, [onChange, focusedIndex, isControlled]);
 
+  const onFound = (index: number) => {
+    dispatch({ type: FOCUS_OPTION, payload: options.current[index] });
+  };
+
+  const onFindItemToFocus = useFindItemToFocus(listboxRef, onFound);
+
   const getOptionProps = ({
     id,
     ref,
@@ -374,6 +387,7 @@ export const useListbox: UseListboxType = ({
     onFocus: composeEventHandlers(onFocus, handleFocus(handlerArgs)),
     onKeyDown: composeEventHandlers(
       onKeyDown,
+      onFindItemToFocus,
       isControlled
         ? handleKeyDownControlled(controlledHandlerArgs)
         : handleKeyDown(handlerArgs)
