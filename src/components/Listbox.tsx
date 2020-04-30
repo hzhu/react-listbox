@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
-import { ListboxContext } from "./useListboxContext";
-import { useListbox, IUseListboxProps } from "./useListbox";
+import { ListboxContext } from "../hooks/useListboxContext";
+import { useListbox, IUseListboxProps } from "../hooks/useListbox";
 
 export interface IListboxProps
   extends Omit<HTMLAttributes<HTMLUListElement>, "onChange" | "onSelect">,

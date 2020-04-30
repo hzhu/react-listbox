@@ -8,7 +8,7 @@ import {
   MutableRefObject,
   HTMLProps,
 } from "react";
-import { KEY_CODES, composeEventHandlers } from "../../../utils";
+import { KEY_CODES, composeEventHandlers } from "../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";

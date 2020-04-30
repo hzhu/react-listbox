@@ -1,9 +1,10 @@
 import React, { createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
-import { Listbox, ListboxOption } from "./";
-import { LISTBOX_CONTEXT_ERROR } from "./components/Listbox/useListboxContext";
-import { KEY_CODES } from "../utils";
+import { Listbox } from "./components/Listbox";
+import { ListboxOption } from "./components/ListboxOption";
+import { LISTBOX_CONTEXT_ERROR } from "./hooks/useListboxContext";
+import { KEY_CODES } from "./utils";
 
 export const KEY_EVENTS = {
   ARROW_UP: { keyCode: KEY_CODES.UP, which: KEY_CODES.UP },

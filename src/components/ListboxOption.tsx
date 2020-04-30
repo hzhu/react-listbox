@@ -1,7 +1,7 @@
 import React, { useRef, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
 import { useId } from "@reach/auto-id";
-import { useListboxContext } from "../Listbox/useListboxContext";
+import { useListboxContext } from "../hooks/useListboxContext";
 
 export interface IListboxOptionProps extends HTMLAttributes<HTMLLIElement> {
   value: string;
