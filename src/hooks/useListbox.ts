@@ -338,6 +338,7 @@ export const useListbox: UseListboxType = ({
 
   const onFound = (index: number) => {
     dispatch({ type: FOCUS_OPTION, payload: options.current[index] });
+    dispatch({ type: SELECT_OPTION, payload: options.current[index] });
   };
 
   const onFindItemToFocus = useFindItemToFocus(listboxRef, onFound);

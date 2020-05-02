@@ -318,6 +318,101 @@ describe("Listbox", () => {
       expect(onSelect).toBeCalledTimes(3);
       expect(onSelect).toHaveBeenCalledWith(SELECTED_OPTIONS);
     });
+
+    test("type a character: selects and focuses the next option that starts with the typed character", () => {
+      const onChange = jest.fn();
+      const onSelect = jest.fn();
+      const { getByText, getByRole } = render(
+        <Listbox onSelect={onSelect} onChange={onChange}>
+          <ListboxOption value="bmw">BMW</ListboxOption>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const bmw = getByText("BMW");
+      const tesla = getByText("Tesla");
+      const listbox = getByRole("listbox");
+
+      expect(onChange).toBeCalledTimes(0);
+      expect(onSelect).toBeCalledTimes(0);
+      expect(listbox).not.toHaveAttribute("aria-activedescendant");
+
+      fireEvent.focus(listbox);
+      expect(onChange).toBeCalledTimes(1);
+      expect(onChange).toBeCalledWith({
+        id: bmw.id,
+        index: 0,
+        value: "bmw",
+      });
+      expect(listbox).toHaveAttribute("aria-activedescendant", bmw.id);
+      expect(onSelect).toBeCalledTimes(1);
+      expect(onSelect).toBeCalledWith({
+        id: bmw.id,
+        index: 0,
+        value: "bmw",
+      });
+
+      fireEvent.keyDown(listbox, {
+        key: "T",
+        which: 84,
+        keyCode: 84,
+      });
+      expect(onChange).toBeCalledTimes(2);
+      expect(onChange).toBeCalledWith({
+        id: tesla.id,
+        index: 2,
+        value: "tesla",
+      });
+      expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+      expect(onSelect).toBeCalledTimes(2);
+      expect(onSelect).toBeCalledWith({
+        id: tesla.id,
+        index: 2,
+        value: "tesla",
+      });
+    });
+
+    test("type multiple characters in rapid succession: focus moves to next item with a name that starts with the string of characters typed.", () => {
+      const onChange = jest.fn();
+      const onSelect = jest.fn();
+      const { getByText, getByRole } = render(
+        <Listbox onSelect={onSelect} onChange={onChange}>
+          <ListboxOption value="bmw">BMW</ListboxOption>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const toyota = getByText("Toyota");
+
+      fireEvent.focus(listbox);
+
+      fireEvent.keyDown(listbox, {
+        key: "T",
+        which: 84,
+        keyCode: 84,
+      });
+
+      fireEvent.keyDown(listbox, {
+        key: "O",
+        which: 79,
+        keyCode: 79,
+      });
+
+      expect(onChange).toBeCalledWith({
+        id: toyota.id,
+        index: 3,
+        value: "toyota",
+      });
+      expect(onSelect).toBeCalledWith({
+        id: toyota.id,
+        index: 3,
+        value: "toyota",
+      });
+      expect(listbox).toHaveAttribute("aria-activedescendant", toyota.id);
+    });
   });
 
   describe("Controlled Usage", () => {
