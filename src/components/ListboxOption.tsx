@@ -12,9 +12,8 @@ export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
     const { currentIndexRef, getOptionProps } = useListboxContext();
     const index = useRef(currentIndexRef.current++).current;
     const stableId = useId();
-    const id = `option--${props.value}--${stableId}`;
 
-    return <li {...getOptionProps({ id, index, ref, ...props })} />;
+    return <li {...getOptionProps({ id: stableId, index, ref, ...props })} />;
   }
 );
 

@@ -343,14 +343,16 @@ export const useListbox: UseListboxType = ({
   const onFindItemToFocus = useFindItemToFocus(listboxRef, onFound);
 
   const getOptionProps = ({
-    id,
+    id: stableId,
     ref,
     index,
     value,
     onClick,
     ...restProps
   }: IGetOptionProps): HTMLProps<HTMLLIElement> => {
-    if (id && !options.current[index]) {
+    const id = `option--${value}--${stableId}`;
+
+    if (stableId && !options.current[index]) {
       const option = { id, index, value };
       options.current[index] = option;
     }
