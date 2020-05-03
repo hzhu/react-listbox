@@ -1,5 +1,6 @@
 {
-  "name": "react-listbox",
+  "name": "@hzhu/react-listbox",
+  "version": "0.1.1",
   "description": "Build and compose WAI-ARIA compliant listbox based React components.",
   "license": "MIT",
   "author": "Henry Zhu <hz@henryzhu.me>",
@@ -21,12 +22,15 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint . --ext .ts --ext .tsx",
     "format": "prettier --write .",
     "start": "start-storybook -p 3000",
-    "build": "babel --extensions \".ts\" -d dist/ src/ && tsc --emitDeclarationOnly",
+    "build": "babel --extensions \".ts\" --extensions \".tsx\" -d dist/ src/ && tsc --emitDeclarationOnly",
     "build-storybook": "build-storybook",
     "clean": "rm -rf ./dist ./storybook-static"
   },
@@ -38,25 +42,28 @@
       "/node_modules/"
     ]
   },
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
   "dependencies": {
     "@reach/auto-id": "^0.10.1",
-    "@storybook/preset-typescript": "^3.0.0",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "prop-types": "^15.7.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
+    "@babel/preset-react": "^7.9.4",
     "@babel/preset-typescript": "^7.9.0",
     "@storybook/addon-docs": "^5.3.18",
     "@storybook/addon-knobs": "^5.3.18",
     "@storybook/addon-links": "^5.3.18",
     "@storybook/addon-storysource": "^5.3.18",
     "@storybook/addons": "^5.3.18",
+    "@storybook/preset-typescript": "^3.0.0",
     "@storybook/react": "^5.3.18",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/react": "^10.0.3",
