@@ -1,6 +1,6 @@
 {
   "name": "@hzhu/react-listbox",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Build and compose WAI-ARIA compliant listbox based React components.",
   "license": "MIT",
   "author": "Henry Zhu <hz@henryzhu.me>",

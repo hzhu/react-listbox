@@ -65,7 +65,7 @@ export type ReducerType = (
 ) => IListboxState;
 
 export interface IGetOptionProps extends HTMLProps<HTMLLIElement> {
-  index: number;
+  index?: number;
   value: string;
 }
 
@@ -351,6 +351,10 @@ export const useListbox: UseListboxType = ({
     onClick,
     ...restProps
   }: IGetOptionProps): HTMLProps<HTMLLIElement> => {
+    if (index === undefined) {
+      throw new Error("An index is required for getOptionProps.");
+    }
+
     const id = `option--${value}--${stableId}`;
 
     if (stableId && !options.current[index]) {

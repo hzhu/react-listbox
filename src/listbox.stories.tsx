@@ -55,6 +55,16 @@ export const Uncontrolled = () => {
   );
 };
 
+Uncontrolled.story = {
+  parameters: {
+    docs: {
+      storyDescription: `An [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _state_, while a
+      controlled component is driven by _props_. This listbox component's behavior is driven by internal state, and demonstrates uncontrolled single-select
+      behavior. The component accepts a \`multiSelect\` prop which toggles on multi-select behavior.`,
+    },
+  },
+};
+
 export const Controlled = () => {
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
   const [selectedIndex, setSelectedIndex] = useState<number | number[]>(0);
@@ -139,22 +149,42 @@ export const Controlled = () => {
   );
 };
 
-Uncontrolled.story = {
-  parameters: {
-    docs: {
-      storyDescription: `An [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _state_, while a
-      controlled component is driven by _props_. This listbox component's behavior is driven by internal state, and demonstrates uncontrolled single-select
-      behavior. The component accepts a \`multiSelect\` prop which toggles on multi-select behavior.`,
-    },
-  },
-};
-
 Controlled.story = {
   parameters: {
     docs: {
       storyDescription: `A [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _props_, while an
       uncontrolled component is driven by _state_. This listbox component's behavior is driven by props, and demonstrates custom behavior such
       as "Select All" and "Deselect All".`,
+    },
+  },
+};
+
+export const StrictMode = () => {
+  const [focusedOption, setFocusedOption] = useState<IOption | undefined>();
+  const onChange = useCallback((option) => setFocusedOption(option), []);
+
+  return (
+    <Listbox onChange={onChange}>
+      {CAR_COMPANIES.map((car, index) => {
+        const { name, value } = car;
+        const isFocused = index === focusedOption?.index;
+        const style = { background: isFocused ? "#96CCFF" : "" };
+
+        return (
+          <ListboxOption key={value} value={value} style={style}>
+            {name} {isFocused && String.fromCharCode(10003)}
+          </ListboxOption>
+        );
+      })}
+    </Listbox>
+  );
+};
+
+StrictMode.story = {
+  parameters: {
+    docs: {
+      storyDescription: `[StrictMode](https://reactjs.org/docs/strict-mode.html#detecting-unexpected-side-effects) is a tool for highlighting potential 
+      problems in an application. It is used here to demonstrate that the components will work in React's [Concurrent Mode](https://reactjs.org/docs/concurrent-mode-intro.html).`,
     },
   },
 };

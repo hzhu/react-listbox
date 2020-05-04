@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
+import React, {
+  Children,
+  forwardRef,
+  cloneElement,
+  ReactElement,
+  HTMLAttributes,
+} from "react";
 import PropTypes from "prop-types";
 import { useMergeRefs } from "../hooks/useMergeRefs";
 import { ListboxContext } from "../hooks/useListboxContext";
@@ -37,18 +43,13 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
       focusedIndex,
       selectedIndex,
     });
-    const currentIndexRef = useRef(0);
-
-    useEffect(() => {
-      currentIndexRef.current = 0;
-    });
-
-    const value = { getOptionProps, currentIndexRef };
 
     return (
-      <ListboxContext.Provider value={value}>
+      <ListboxContext.Provider value={getOptionProps}>
         <ul {...getListboxProps({ ref: listboxRef, ...restProps })}>
-          {children}
+          {Children.map(children, (child, index) =>
+            cloneElement(child as ReactElement, { index })
+          )}
         </ul>
       </ListboxContext.Provider>
     );
