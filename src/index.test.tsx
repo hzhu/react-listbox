@@ -353,11 +353,7 @@ describe("Listbox", () => {
         value: "bmw",
       });
 
-      fireEvent.keyDown(listbox, {
-        key: "T",
-        which: 84,
-        keyCode: 84,
-      });
+      fireEvent.keyDown(listbox, { key: "T" });
       expect(onChange).toBeCalledTimes(2);
       expect(onChange).toBeCalledWith({
         id: tesla.id,
@@ -374,6 +370,7 @@ describe("Listbox", () => {
     });
 
     test("type multiple characters in rapid succession: focus moves to next item with a name that starts with the string of characters typed.", () => {
+      jest.useFakeTimers();
       const onChange = jest.fn();
       const onSelect = jest.fn();
       const { getByText, getByRole } = render(
@@ -386,20 +383,11 @@ describe("Listbox", () => {
       );
       const listbox = getByRole("listbox");
       const toyota = getByText("Toyota");
+      const bmw = getByText("BMW");
 
       fireEvent.focus(listbox);
-
-      fireEvent.keyDown(listbox, {
-        key: "T",
-        which: 84,
-        keyCode: 84,
-      });
-
-      fireEvent.keyDown(listbox, {
-        key: "O",
-        which: 79,
-        keyCode: 79,
-      });
+      fireEvent.keyDown(listbox, { key: "T" });
+      fireEvent.keyDown(listbox, { key: "O" });
 
       expect(onChange).toBeCalledWith({
         id: toyota.id,
@@ -412,6 +400,18 @@ describe("Listbox", () => {
         value: "toyota",
       });
       expect(listbox).toHaveAttribute("aria-activedescendant", toyota.id);
+
+      // Fast-forward until all timers have been executed
+      jest.runAllTimers();
+
+      fireEvent.keyDown(listbox, { key: "B" });
+
+      expect(onSelect).toBeCalledWith({
+        id: bmw.id,
+        index: 0,
+        value: "bmw",
+      });
+      expect(listbox).toHaveAttribute("aria-activedescendant", bmw.id);
     });
   });
 

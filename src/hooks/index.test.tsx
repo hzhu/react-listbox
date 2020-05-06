@@ -1,7 +1,8 @@
-import React, { forwardRef, createRef, HTMLAttributes } from "react";
-import { render } from "@testing-library/react";
+import React, { forwardRef, useRef, createRef, HTMLAttributes } from "react";
+import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { useMergeRefs } from "./useMergeRefs";
+import { useFindItemToFocus } from "./useFindItemToFocus";
 
 describe("Hooks", () => {
   describe("useMergeRefs", () => {
@@ -38,6 +39,45 @@ describe("Hooks", () => {
 
       expect(ref).toBeCalledTimes(1);
       expect(ref).toBeCalledWith(button);
+    });
+  });
+
+  describe("useFindItemFocus", () => {
+    test("does not provided callback when the ref is null", () => {
+      const onFound = jest.fn();
+      const Listbox = () => {
+        const listboxRef = useRef<HTMLUListElement>(null);
+        const onKeyDown = useFindItemToFocus(listboxRef, onFound);
+        return <ul role="listbox" onKeyDown={onKeyDown}></ul>;
+      };
+      const { getByRole } = render(<Listbox />);
+      const listbox = getByRole("listbox");
+
+      fireEvent.keyDown(listbox, { key: "T" });
+
+      expect(onFound).toBeCalledTimes(0);
+    });
+
+    test("calls provided callback with the correct option index", () => {
+      const onFound = jest.fn();
+      const Comp = () => {
+        const listboxRef = useRef<HTMLUListElement>(null);
+        const onKeyDown = useFindItemToFocus(listboxRef, onFound);
+        return (
+          <ul role="listbox" ref={listboxRef} onKeyDown={onKeyDown}>
+            <li role="option">one</li>
+            <li role="option">two</li>
+            <li role="option">three</li>
+          </ul>
+        );
+      };
+      const { getByRole } = render(<Comp />);
+      const listbox = getByRole("listbox");
+
+      fireEvent.keyDown(listbox, { key: "T" });
+      fireEvent.keyDown(listbox, { key: "H" });
+
+      expect(onFound).toBeCalledWith(2);
     });
   });
 });
