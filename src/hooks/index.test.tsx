@@ -65,9 +65,15 @@ describe("Hooks", () => {
         const onKeyDown = useFindItemToFocus(listboxRef, onFound);
         return (
           <ul role="listbox" ref={listboxRef} onKeyDown={onKeyDown}>
-            <li role="option">one</li>
-            <li role="option">two</li>
-            <li role="option">three</li>
+            <li role="option" aria-selected="false">
+              one
+            </li>
+            <li role="option" aria-selected="false">
+              two
+            </li>
+            <li role="option" aria-selected="false">
+              three
+            </li>
           </ul>
         );
       };
