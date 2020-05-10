@@ -362,9 +362,26 @@ export const useListbox: UseListboxType = ({
       options.current[index] = option;
     }
 
-    const ariaSelected = multiSelect
-      ? id === (selectedValues[value] && selectedValues[value].id)
-      : id === selectedId;
+    let ariaSelected = false;
+
+    if (isControlled) {
+      if (Array.isArray(controlledSelectedIndex)) {
+        if (controlledSelectedIndex.includes(index)) {
+          ariaSelected = true;
+        }
+      }
+      if (index === controlledSelectedIndex) {
+        ariaSelected = true;
+      }
+    } else {
+      if (multiSelect) {
+        if (id === (selectedValues[value] && selectedValues[value].id)) {
+          ariaSelected = true;
+        }
+      } else if (id === selectedId) {
+        ariaSelected = true;
+      }
+    }
 
     return {
       id,

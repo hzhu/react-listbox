@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { useState, createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Listbox } from "./components/Listbox";
@@ -416,6 +416,41 @@ describe("Listbox", () => {
   });
 
   describe("Controlled Usage", () => {
+    test("sets the correct aria-selected attribute", () => {
+      const Basic = () => {
+        const INITIAL_SELECTED_INDEX = 1;
+        const ALL_INDICES = [0, INITIAL_SELECTED_INDEX, 2];
+        const [controlledIndex, setControlledIndex] = useState<
+          number | number[]
+        >(INITIAL_SELECTED_INDEX);
+        const onSelectAll = () => setControlledIndex(ALL_INDICES);
+
+        return (
+          <>
+            <Listbox selectedIndex={controlledIndex}>
+              <ListboxOption value="ford">Ford</ListboxOption>
+              <ListboxOption value="tesla">Tesla</ListboxOption>
+              <ListboxOption value="toyota">Toyota</ListboxOption>
+            </Listbox>
+            <button onClick={onSelectAll}>Select All</button>
+          </>
+        );
+      };
+      const { getByText } = render(<Basic />);
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
+      const toyota = getByText("Toyota");
+      const selectAll = getByText("Select All");
+
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+
+      fireEvent.click(selectAll);
+
+      expect(ford).toHaveAttribute("aria-selected", "true");
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+      expect(toyota).toHaveAttribute("aria-selected", "true");
+    });
+
     test("calls onChange with the correct option on keyboard selection", () => {
       const onChange = jest.fn();
       const controlledIndex = 1;
@@ -477,9 +512,9 @@ describe("Listbox", () => {
 
     test("calls onSelect with the correct option on keyboard selection", () => {
       const onSelect = jest.fn();
-      const controlledFocusedIndex = 1;
+      const controlledIndex = 1;
       const { getByText, getByRole } = render(
-        <Listbox focusedIndex={controlledFocusedIndex} onSelect={onSelect}>
+        <Listbox onSelect={onSelect} focusedIndex={controlledIndex}>
           <ListboxOption value="ford">Ford</ListboxOption>
           <ListboxOption value="tesla">Tesla</ListboxOption>
           <ListboxOption value="toyota">Toyota</ListboxOption>
@@ -493,7 +528,7 @@ describe("Listbox", () => {
       expect(onSelect).toBeCalledTimes(1);
       expect(onSelect).toBeCalledWith({
         id: tesla.id,
-        index: controlledFocusedIndex,
+        index: controlledIndex,
         value: "tesla",
       });
     });
