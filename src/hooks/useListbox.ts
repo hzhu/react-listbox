@@ -74,6 +74,7 @@ export interface IGetListboxProps extends HTMLProps<HTMLUListElement> {}
 export interface IUseListboxReturnValue {
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
   getListboxProps: (props: IGetListboxProps) => HTMLProps<HTMLUListElement>;
+  options: MutableRefObject<IOption[]>;
 }
 
 export interface IListboxProps {
@@ -344,7 +345,7 @@ export const useListbox: UseListboxType = ({
   const onFindItemToFocus = useFindItemToFocus(listboxRef, onFound);
 
   const getOptionProps = ({
-    id: stableId,
+    id,
     ref,
     index,
     value,
@@ -353,13 +354,6 @@ export const useListbox: UseListboxType = ({
   }: IGetOptionProps): HTMLProps<HTMLLIElement> => {
     if (index === undefined) {
       throw new Error("An index is required for getOptionProps.");
-    }
-
-    const id = `option--${value}--${stableId}`;
-
-    if (stableId && !options.current[index]) {
-      const option = { id, index, value };
-      options.current[index] = option;
     }
 
     let ariaSelected = false;
@@ -420,6 +414,7 @@ export const useListbox: UseListboxType = ({
   });
 
   return {
+    options,
     getOptionProps,
     getListboxProps,
   };

@@ -2,7 +2,9 @@ import React, { useState, useCallback } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
 import { Listbox } from "./components/Listbox";
 import { ListboxOption } from "./components/ListboxOption";
+import { ListboxGroup } from "./components/ListboxGroup";
 import { SelectedValues, IOption } from "./hooks/useListbox";
+import "./stories.css";
 
 const CAR_COMPANIES = [
   { name: "BMW Group", value: "bmw" },
@@ -189,11 +191,40 @@ StrictMode.story = {
   },
 };
 
+export const Grouped = () => {
+  return (
+    <Listbox>
+      <ListboxGroup
+        label={<span style={{ fontWeight: 700 }}>United States</span>}
+      >
+        <ListboxOption value="ford">Ford</ListboxOption>
+        <ListboxOption value="gm">General Motors</ListboxOption>
+        <ListboxOption value="tesla">Tesla</ListboxOption>
+      </ListboxGroup>
+      <ListboxGroup label={<span style={{ fontWeight: 700 }}>Japan</span>}>
+        <ListboxOption value="toyota">Toyota</ListboxOption>
+        <ListboxOption value="honda">Honda</ListboxOption>
+        <ListboxOption value="suzuki">Suzuki</ListboxOption>
+      </ListboxGroup>
+    </Listbox>
+  );
+};
+
+Grouped.story = {
+  parameters: {
+    docs: {
+      storyDescription: `This story demonstrates a grouped listbox component using the \`<ListboxGroup>\` component.
+      Each group renders a label which (visually) identifies the group of options to users. Internally, an ID associates
+      the label and the group which allows screen readers to identify the group of options to users.`,
+    },
+  },
+};
+
 export default {
   title: "Listbox",
   decorators: [withKnobs],
   component: Listbox,
-  subcomponents: { ListboxOption },
+  subcomponents: { ListboxOption, ListboxGroup },
   parameters: {
     componentSubtitle:
       "A listbox widget presents a list of options and allows a user to select one or more of them.",

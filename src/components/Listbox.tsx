@@ -1,10 +1,4 @@
-import React, {
-  Children,
-  forwardRef,
-  cloneElement,
-  ReactElement,
-  HTMLAttributes,
-} from "react";
+import React, { useRef, forwardRef, HTMLAttributes } from "react";
 import PropTypes from "prop-types";
 import { useMergeRefs } from "../hooks/useMergeRefs";
 import { ListboxContext } from "../hooks/useListboxContext";
@@ -34,8 +28,9 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
     } = props;
 
     const listboxRef = useMergeRefs<HTMLUListElement>(ref);
+    const currentIndexRef = useRef(0);
 
-    const { getOptionProps, getListboxProps } = useListbox({
+    const { options, getOptionProps, getListboxProps } = useListbox({
       listboxRef,
       multiSelect,
       onChange,
@@ -44,12 +39,16 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
       selectedIndex,
     });
 
+    const value = {
+      options,
+      getOptionProps,
+      currentIndexRef,
+    };
+
     return (
-      <ListboxContext.Provider value={getOptionProps}>
+      <ListboxContext.Provider value={value}>
         <ul {...getListboxProps({ ref: listboxRef, ...restProps })}>
-          {Children.map(children, (child, index) =>
-            cloneElement(child as ReactElement, { index })
-          )}
+          {children}
         </ul>
       </ListboxContext.Provider>
     );

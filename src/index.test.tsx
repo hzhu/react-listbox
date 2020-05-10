@@ -2,6 +2,7 @@ import React, { useState, createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Listbox } from "./components/Listbox";
+import { ListboxGroup } from "./components/ListboxGroup";
 import { ListboxOption } from "./components/ListboxOption";
 import { LISTBOX_CONTEXT_ERROR } from "./hooks/useListboxContext";
 import { KEY_CODES } from "./utils";
@@ -556,6 +557,68 @@ describe("Listbox", () => {
         fireEvent.click(option);
         expect(onSelect).toBeCalledWith(OPTIONS_BY_ID[option.id]);
       });
+    });
+  });
+
+  describe("Grouped Listbox", () => {
+    test("correctly associates a group to an label", () => {
+      const { getAllByRole, getByText } = render(
+        <Listbox>
+          <ListboxGroup label={<span>United States</span>}>
+            <ListboxOption value="ford">Ford</ListboxOption>
+            <ListboxOption value="tesla">Tesla</ListboxOption>
+          </ListboxGroup>
+          <ListboxGroup label={<span>Germany</span>}>
+            <ListboxOption value="bmw">BMW</ListboxOption>
+            <ListboxOption value="daimler">Daimler AG</ListboxOption>
+          </ListboxGroup>
+        </Listbox>
+      );
+      const usa = getByText("United States");
+      const de = getByText("Germany");
+      const groups = getAllByRole("group");
+
+      expect(groups[0]).toHaveAttribute("aria-labelledby", usa.id);
+      expect(groups[1]).toHaveAttribute("aria-labelledby", de.id);
+    });
+
+    test("can select an option from a grouped listbox", () => {
+      const onChange = jest.fn();
+      const { getByRole, getByText } = render(
+        <Listbox onChange={onChange}>
+          <ListboxGroup label={<span>United States</span>}>
+            <ListboxOption value="ford">Ford</ListboxOption>
+            <ListboxOption value="tesla">Tesla</ListboxOption>
+          </ListboxGroup>
+          <ListboxGroup label={<span>Germany</span>}>
+            <ListboxOption value="bmw">BMW</ListboxOption>
+            <ListboxOption value="daimler">Daimler AG</ListboxOption>
+          </ListboxGroup>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const ford = getByText("Ford");
+      const tesla = getByText("Tesla");
+      const bmw = getByText("BMW");
+
+      const OPTIONS = {
+        ford: { id: ford.id, index: 0, value: "ford" },
+        tesla: { id: tesla.id, index: 1, value: "tesla" },
+        bmw: { id: bmw.id, index: 2, value: "bmw" },
+      };
+
+      expect(onChange).toBeCalledTimes(0);
+
+      fireEvent.click(ford);
+      expect(onChange).toBeCalledWith(OPTIONS.ford);
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
+      expect(onChange).toBeCalledWith(OPTIONS.tesla);
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_DOWN);
+      expect(onChange).toBeCalledWith(OPTIONS.bmw);
+
+      expect(onChange).toBeCalledTimes(3);
     });
   });
 });

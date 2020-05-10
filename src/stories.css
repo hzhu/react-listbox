@@ -1,0 +1,3 @@
+div[role="group"] [aria-selected="true"] {
+  background-color: #96ccff;
+}
