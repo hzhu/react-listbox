@@ -166,19 +166,21 @@ export const StrictMode = () => {
   const onChange = useCallback((option) => setFocusedOption(option), []);
 
   return (
-    <Listbox onChange={onChange}>
-      {CAR_COMPANIES.map((car, index) => {
-        const { name, value } = car;
-        const isFocused = index === focusedOption?.index;
-        const style = { background: isFocused ? "#96CCFF" : "" };
+    <React.StrictMode>
+      <Listbox onChange={onChange}>
+        {CAR_COMPANIES.map((car, index) => {
+          const { name, value } = car;
+          const isFocused = index === focusedOption?.index;
+          const style = { background: isFocused ? "#96CCFF" : "" };
 
-        return (
-          <ListboxOption key={value} value={value} style={style}>
-            {name} {isFocused && String.fromCharCode(10003)}
-          </ListboxOption>
-        );
-      })}
-    </Listbox>
+          return (
+            <ListboxOption key={value} value={value} style={style}>
+              {name} {isFocused && String.fromCharCode(10003)}
+            </ListboxOption>
+          );
+        })}
+      </Listbox>
+    </React.StrictMode>
   );
 };
 

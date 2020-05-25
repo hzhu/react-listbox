@@ -28,6 +28,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
     } = props;
 
     const listboxRef = useMergeRefs<HTMLUListElement>(ref);
+    const valuesRef = useRef<string[]>([]);
     const currentIndexRef = useRef(0);
 
     const { options, getOptionProps, getListboxProps } = useListbox({
@@ -41,6 +42,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
 
     const value = {
       options,
+      valuesRef,
       getOptionProps,
       currentIndexRef,
     };

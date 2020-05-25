@@ -318,7 +318,7 @@ export const useListbox: UseListboxType = ({
         onSelect && onSelect(selectedValues);
       } else {
         const option = options.current[selectedIndex];
-        option && onSelect && onSelect(option);
+        selectedIndex > -1 && option && onSelect && onSelect(option);
       }
     }
   }, [
@@ -333,7 +333,7 @@ export const useListbox: UseListboxType = ({
   useEffect(() => {
     if (isControlled === false) {
       const option = options.current[focusedIndex];
-      option && onChange && onChange(option);
+      focusedIndex > -1 && option && onChange && onChange(option);
     }
   }, [onChange, focusedIndex, isControlled]);
 

@@ -3,6 +3,7 @@ import { IOption, IGetOptionProps } from "./useListbox";
 
 export interface IListboxContext {
   options: MutableRefObject<IOption[]>;
+  valuesRef: MutableRefObject<string[]>;
   currentIndexRef: MutableRefObject<number>;
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
 }

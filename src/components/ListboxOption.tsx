@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, forwardRef, HTMLAttributes } from "react";
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  HTMLAttributes,
+  MutableRefObject,
+} from "react";
 import PropTypes from "prop-types";
 import { useId } from "@reach/auto-id";
 import { useListboxContext } from "../hooks/useListboxContext";
@@ -7,36 +13,42 @@ export interface IListboxOptionProps extends HTMLAttributes<HTMLLIElement> {
   value: string;
 }
 
+export interface IUseOptionIndexArgs {
+  value: string;
+  valuesRef: MutableRefObject<string[]>;
+}
+
+// Force additional render when index is found.
+const useOptionIndex = ({ value, valuesRef }: IUseOptionIndexArgs) => {
+  const [index, forceUpdate] = useState(-1);
+
+  useEffect(() => {
+    valuesRef.current.push(value);
+
+    for (let i = valuesRef.current.length - 1; i >= 0; i--) {
+      const currentValue = valuesRef.current[i];
+
+      if (currentValue === value) {
+        forceUpdate(i);
+        break;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return index;
+};
+
 export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
   (props, ref) => {
-    const id = useId();
     const { value } = props;
-    const prefixedId = `option--${value}--${id}`;
-    const { options, getOptionProps, currentIndexRef } = useListboxContext();
-    const index = useRef(currentIndexRef.current++);
+    const id = `option--${value}--${useId()}`;
+    const { options, getOptionProps, valuesRef } = useListboxContext();
+    const index = useOptionIndex({ value, valuesRef });
 
-    useEffect(() => {
-      if (id) {
-        const option = {
-          value,
-          id: prefixedId,
-          index: index.current,
-        };
+    options.current[index] = { id, value, index };
 
-        options.current[index.current] = option;
-      }
-    }, [id, value, options, prefixedId]);
-
-    return (
-      <li
-        {...getOptionProps({
-          ref,
-          id: prefixedId,
-          index: index.current,
-          ...props,
-        })}
-      />
-    );
+    return <li {...getOptionProps({ ref, id, index, ...props })} />;
   }
 );
 
