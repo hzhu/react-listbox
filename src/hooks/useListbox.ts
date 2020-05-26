@@ -1,5 +1,6 @@
 import {
   useRef,
+  useState,
   useEffect,
   useReducer,
   Dispatch,
@@ -392,6 +393,21 @@ export const useListbox: UseListboxType = ({
     };
   };
 
+  const [controlledActiveDescendant, setControlledActiveDescendant] = useState<
+    string
+  >();
+
+  // Does not have a dependencies array so that active-descendant
+  // can be up-to-date after initial render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (controlledFocusedIndex !== undefined && listboxRef.current) {
+      setControlledActiveDescendant(
+        listboxRef.current.children[controlledFocusedIndex].id
+      );
+    }
+  });
+
   const getListboxProps = ({
     ref,
     onFocus,
@@ -401,7 +417,9 @@ export const useListbox: UseListboxType = ({
     ref,
     tabIndex: 0,
     role: "listbox",
-    "aria-activedescendant": state.focusedId || undefined,
+    "aria-activedescendant": isControlled
+      ? controlledActiveDescendant
+      : state.focusedId || undefined,
     onFocus: composeEventHandlers(onFocus, handleFocus(handlerArgs)),
     onKeyDown: composeEventHandlers(
       onKeyDown,

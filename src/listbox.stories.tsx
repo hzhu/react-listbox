@@ -68,8 +68,8 @@ Uncontrolled.story = {
 };
 
 export const Controlled = () => {
-  const [focusedIndex, setFocusedIndex] = useState<number>(0);
-  const [selectedIndex, setSelectedIndex] = useState<number | number[]>(0);
+  const [focusedIndex, setFocusedIndex] = useState<number>(13);
+  const [selectedIndex, setSelectedIndex] = useState<number | number[]>(13);
   const isLast = focusedIndex === CAR_COMPANIES.length - 1;
   const isFirst = focusedIndex === 0;
   const allSelected =

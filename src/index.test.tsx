@@ -417,6 +417,23 @@ describe("Listbox", () => {
   });
 
   describe("Controlled Usage", () => {
+    test("sets the correct aria-activedescendant attribute", () => {
+      const INITIAL_FOCUSED_INDEX = 1;
+      const { getByRole, getByText } = render(
+        <>
+          <Listbox focusedIndex={INITIAL_FOCUSED_INDEX}>
+            <ListboxOption value="ford">Ford</ListboxOption>
+            <ListboxOption value="tesla">Tesla</ListboxOption>
+            <ListboxOption value="toyota">Toyota</ListboxOption>
+          </Listbox>
+        </>
+      );
+      const tesla = getByText("Tesla");
+      const listbox = getByRole("listbox");
+
+      expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+    });
+
     test("sets the correct aria-selected attribute", () => {
       const Basic = () => {
         const INITIAL_SELECTED_INDEX = 1;
