@@ -1,6 +1,6 @@
 {
   "name": "@hzhu/react-listbox",
-  "version": "0.2.2",
+  "version": "0.3.2",
   "description": "Build and compose WAI-ARIA compliant listbox based React components.",
   "license": "MIT",
   "author": "Henry Zhu <hz@henryzhu.me>",
@@ -56,6 +56,7 @@
   "devDependencies": {
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.1",
+    "@babel/preset-env": "^7.10.1",
     "@babel/preset-react": "^7.10.1",
     "@babel/preset-typescript": "^7.10.1",
     "@storybook/addon-docs": "^5.3.19",
