@@ -11,6 +11,8 @@ export const KEY_EVENTS = {
   ARROW_UP: { keyCode: KEY_CODES.UP, which: KEY_CODES.UP },
   ARROW_DOWN: { keyCode: KEY_CODES.DOWN, which: KEY_CODES.DOWN },
   RETURN: { keyCode: KEY_CODES.RETURN, which: KEY_CODES.RETURN },
+  HOME: { keyCode: KEY_CODES.HOME, which: KEY_CODES.HOME },
+  END: { keyCode: KEY_CODES.END, which: KEY_CODES.END },
 };
 
 describe("Listbox", () => {
@@ -413,6 +415,42 @@ describe("Listbox", () => {
         value: "bmw",
       });
       expect(listbox).toHaveAttribute("aria-activedescendant", bmw.id);
+    });
+
+    test("focuses and selects the first/last option when HOME/END key is pressed", () => {
+      const onChange = jest.fn();
+      const onSelect = jest.fn();
+      const { getByRole, getByText } = render(
+        <Listbox onChange={onChange} onSelect={onSelect}>
+          <ListboxOption value="bmw">BMW</ListboxOption>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const bmw = getByText("BMW");
+      const toyota = getByText("Toyota");
+      const firstOption = { id: bmw.id, index: 0, value: "bmw" };
+      const lastOption = { id: toyota.id, index: 3, value: "toyota" };
+      expect(bmw).toHaveAttribute("aria-selected", "false");
+      expect(toyota).toHaveAttribute("aria-selected", "false");
+      expect(onChange).toHaveBeenCalledTimes(0);
+      expect(onSelect).toHaveBeenCalledTimes(0);
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.HOME);
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(firstOption);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+      expect(onSelect).toHaveBeenCalledWith(firstOption);
+      expect(bmw).toHaveAttribute("aria-selected", "true");
+
+      fireEvent.keyDown(listbox, KEY_EVENTS.END);
+      expect(onChange).toHaveBeenCalledTimes(2);
+      expect(onChange).toHaveBeenCalledWith(lastOption);
+      expect(onSelect).toHaveBeenCalledTimes(2);
+      expect(onSelect).toHaveBeenCalledWith(lastOption);
+      expect(toyota).toHaveAttribute("aria-selected", "true");
     });
   });
 

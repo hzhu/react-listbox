@@ -272,6 +272,16 @@ const handleKeyDown = ({
         dispatch({ type: MULTI_SELECT_OPTION, payload: option });
       }
       break;
+    case KEY_CODES.HOME:
+      const firstOption = options.current[0];
+      dispatch({ type: FOCUS_OPTION, payload: firstOption });
+      dispatch({ type: SELECT_OPTION, payload: firstOption });
+      break;
+    case KEY_CODES.END:
+      const lastOption = options.current[options.current.length - 1];
+      dispatch({ type: FOCUS_OPTION, payload: lastOption });
+      dispatch({ type: SELECT_OPTION, payload: lastOption });
+      break;
   }
 };
 
