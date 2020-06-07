@@ -142,8 +142,6 @@ const reducer: ReducerType = (state, action) => {
         selectedIndex: index,
         selectedValues: nextSelectedValues,
       };
-    default:
-      return state;
   }
 };
 
