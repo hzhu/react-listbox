@@ -3,6 +3,7 @@ import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { useMergeRefs } from "./useMergeRefs";
 import { useFindItemToFocus } from "./useFindItemToFocus";
+import { useListbox } from "./useListbox";
 
 describe("Hooks", () => {
   describe("useMergeRefs", () => {
@@ -84,6 +85,19 @@ describe("Hooks", () => {
       fireEvent.keyDown(listbox, { key: "H" });
 
       expect(onFound).toBeCalledWith(2);
+    });
+  });
+
+  describe("useListbox", () => {
+    test("getOptionProps: throws an error when no index is passed", () => {
+      const Basic = () => {
+        const ref = createRef<HTMLUListElement>();
+        const { getOptionProps } = useListbox({ listboxRef: ref });
+        expect(() => getOptionProps({ value: "foo" })).toThrow();
+        return <ul ref={ref}></ul>;
+      };
+
+      render(<Basic />);
     });
   });
 });
