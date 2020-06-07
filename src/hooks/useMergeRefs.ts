@@ -1,9 +1,10 @@
-import { useRef, useEffect, RefObject } from "react";
+import { useRef, useEffect, RefObject, MutableRefObject } from "react";
 
 export type Ref<T> =
   | null
   | undefined
   | RefObject<T>
+  | MutableRefObject<T>
   | ((instance: T | null) => void);
 
 export function useMergeRefs<T>(...refs: Ref<T>[]) {
