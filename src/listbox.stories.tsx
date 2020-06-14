@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, CSSProperties } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
 import { Listbox } from "./components/Listbox";
 import { ListboxOption } from "./components/ListboxOption";
@@ -27,18 +27,29 @@ const CAR_COMPANIES = [
 ];
 
 export const Uncontrolled = () => {
-  const label = "multiSelect";
   const defaultValue = false;
-  const multiSelect = boolean(label, defaultValue);
+  const scroll = boolean("scroll", defaultValue);
+  const multiSelect = boolean("multiSelect", defaultValue);
   const [focusedOption, setFocusedOption] = useState<IOption | undefined>();
   const [selectedOption, setSelectedOption] = useState<
     IOption | SelectedValues
   >({});
   const onChange = useCallback((option) => setFocusedOption(option), []);
   const onSelect = useCallback((option) => setSelectedOption(option), []);
+  const style: CSSProperties = {
+    maxHeight: "10em",
+    overflowY: "auto",
+    position: "relative",
+    border: "1px solid #ccc",
+  };
 
   return (
-    <Listbox multiSelect={multiSelect} onChange={onChange} onSelect={onSelect}>
+    <Listbox
+      onChange={onChange}
+      onSelect={onSelect}
+      multiSelect={multiSelect}
+      style={scroll ? style : undefined}
+    >
       {CAR_COMPANIES.map((car, index) => {
         const { name, value } = car;
         const isFocused = index === focusedOption?.index;

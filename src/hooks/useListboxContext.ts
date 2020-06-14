@@ -1,8 +1,15 @@
-import { useContext, HTMLProps, createContext, MutableRefObject } from "react";
+import {
+  useContext,
+  createContext,
+  HTMLProps,
+  RefObject,
+  MutableRefObject,
+} from "react";
 import { IOption, IGetOptionProps } from "./useListbox";
 
 export interface IListboxContext {
   options: MutableRefObject<IOption[]>;
+  optionsRef: MutableRefObject<RefObject<HTMLLIElement>[]>;
   valuesRef: MutableRefObject<string[]>;
   currentIndexRef: MutableRefObject<number>;
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;

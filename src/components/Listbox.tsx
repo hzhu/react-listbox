@@ -31,18 +31,21 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
     const valuesRef = useRef<string[]>([]);
     const currentIndexRef = useRef(0);
 
-    const { options, getOptionProps, getListboxProps } = useListbox({
-      listboxRef,
-      multiSelect,
-      onChange,
-      onSelect,
-      focusedIndex,
-      selectedIndex,
-    });
+    const { options, optionsRef, getOptionProps, getListboxProps } = useListbox(
+      {
+        onChange,
+        onSelect,
+        multiSelect,
+        focusedIndex,
+        selectedIndex,
+        listboxRef,
+      }
+    );
 
     const value = {
       options,
       valuesRef,
+      optionsRef,
       getOptionProps,
       currentIndexRef,
     };

@@ -24,3 +24,20 @@ export const composeEventHandlers = (...handlers: Handlers) => (
 ) => {
   handlers.forEach((handler) => handler && handler(e));
 };
+
+export const focusElement = (
+  element: HTMLElement | null,
+  container: HTMLUListElement | null
+) => {
+  if (element === null || container === null) return;
+
+  const scrollBottom = container.clientHeight + container.scrollTop;
+  const elementBottom = element.offsetTop + element.offsetHeight;
+  if (elementBottom > scrollBottom) {
+    /* istanbul ignore next */
+    container.scrollTop = elementBottom - container.clientHeight;
+  } else if (element.offsetTop < container.scrollTop) {
+    /* istanbul ignore next */
+    container.scrollTop = element.offsetTop;
+  }
+};

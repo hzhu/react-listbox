@@ -11,7 +11,7 @@ import {
   HTMLProps,
 } from "react";
 import { useFindItemToFocus } from "./useFindItemToFocus";
-import { KEY_CODES, composeEventHandlers } from "../utils";
+import { KEY_CODES, composeEventHandlers, focusElement } from "../utils";
 
 export const FOCUS_OPTION = "focus option";
 export const SELECT_OPTION = "select option";
@@ -76,6 +76,7 @@ export interface IUseListboxReturnValue {
   getOptionProps: (props: IGetOptionProps) => HTMLProps<HTMLLIElement>;
   getListboxProps: (props: IGetListboxProps) => HTMLProps<HTMLUListElement>;
   options: MutableRefObject<IOption[]>;
+  optionsRef: MutableRefObject<RefObject<HTMLLIElement>[]>;
 }
 
 export interface IListboxProps {
@@ -99,6 +100,8 @@ export interface IHandlerArg extends IListboxProps {
   state: IListboxState;
   dispatch: Dispatch<ListboxActionTypes>;
   options: MutableRefObject<IOption[]>;
+  optionsRef: MutableRefObject<MutableRefObject<HTMLLIElement>[]>;
+  listboxRef: RefObject<HTMLUListElement>;
 }
 
 export type UseListboxType = (
@@ -232,6 +235,8 @@ const handleKeyDown = ({
   dispatch,
   options,
   multiSelect,
+  listboxRef,
+  optionsRef,
 }: IHandlerArg) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
   const { focusedIndex } = state;
@@ -242,6 +247,7 @@ const handleKeyDown = ({
     case KEY_CODES.UP:
       if (focusedIndex > 0) {
         const nextIndex = focusedIndex - 1;
+        focusElement(optionsRef.current[nextIndex].current, listboxRef.current);
         const option = options.current[nextIndex];
         if (multiSelect) {
           dispatch({ type: FOCUS_OPTION, payload: option });
@@ -254,6 +260,7 @@ const handleKeyDown = ({
     case KEY_CODES.DOWN:
       if (focusedIndex !== options.current.length - 1) {
         const nextIndex = focusedIndex + 1;
+        focusElement(optionsRef.current[nextIndex].current, listboxRef.current);
         const option = options.current[nextIndex];
         if (multiSelect) {
           dispatch({ type: FOCUS_OPTION, payload: option });
@@ -294,6 +301,7 @@ export const useListbox: UseListboxType = ({
   const isControlled =
     controlledSelectedIndex != null || controlledFocusedIndex != null;
   const options = useRef<IOption[]>([]);
+  const optionsRef = useRef<MutableRefObject<HTMLLIElement>[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const handlerArgs = {
     state,
@@ -302,6 +310,8 @@ export const useListbox: UseListboxType = ({
     onChange,
     onSelect,
     multiSelect,
+    optionsRef,
+    listboxRef,
   };
   const controlledHandlerArgs = {
     state: {
@@ -441,6 +451,7 @@ export const useListbox: UseListboxType = ({
 
   return {
     options,
+    optionsRef,
     getOptionProps,
     getListboxProps,
   };
