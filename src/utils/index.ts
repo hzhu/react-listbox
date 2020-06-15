@@ -1,6 +1,22 @@
 import { SyntheticEvent } from "react";
 
-export const KEY_CODES: Record<string, number> = {
+export type KEY =
+  | "BACKSPACE"
+  | "TAB"
+  | "RETURN"
+  | "ESC"
+  | "SPACE"
+  | "PAGE_UP"
+  | "PAGE_DOWN"
+  | "END"
+  | "HOME"
+  | "LEFT"
+  | "UP"
+  | "RIGHT"
+  | "DOWN"
+  | "DELETE";
+
+export const KEY_CODES: Record<KEY, number> = {
   BACKSPACE: 8,
   TAB: 9,
   RETURN: 13,
