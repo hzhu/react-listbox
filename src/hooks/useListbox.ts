@@ -202,6 +202,9 @@ const handleKeyDownControlled = ({
   onSelect,
 }: IControlledHandlerArgs) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
+
+  if (key === KEY_CODES.TAB) return;
+
   const { focusedIndex } = state;
 
   if (focusedIndex === undefined || focusedIndex < 0) return;
@@ -239,6 +242,9 @@ const handleKeyDown = ({
   optionsRef,
 }: IHandlerArg) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
+
+  if (key === KEY_CODES.TAB) return;
+
   const { focusedIndex } = state;
 
   e.preventDefault();

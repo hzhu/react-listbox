@@ -1,5 +1,6 @@
 import React, { useState, createRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/extend-expect";
 import { Listbox } from "./components/Listbox";
 import { ListboxGroup } from "./components/ListboxGroup";
@@ -13,6 +14,8 @@ export const KEY_EVENTS = {
   RETURN: { keyCode: KEY_CODES.RETURN, which: KEY_CODES.RETURN },
   HOME: { keyCode: KEY_CODES.HOME, which: KEY_CODES.HOME },
   END: { keyCode: KEY_CODES.END, which: KEY_CODES.END },
+  TAB: { keyCode: KEY_CODES.TAB, which: KEY_CODES.TAB },
+  SHIFT: { keyCode: KEY_CODES.SHIFT, which: KEY_CODES.SHIFT },
 };
 
 describe("Listbox", () => {
@@ -114,6 +117,39 @@ describe("Listbox", () => {
 
       fireEvent.keyDown(listbox, KEY_EVENTS.ARROW_UP);
       expect(listbox).toHaveAttribute("aria-activedescendant", ford.id);
+    });
+
+    test("can move focus from listbox to next (tab) & previous (shift+tab) element", () => {
+      const { getByRole, getByText } = render(
+        <>
+          <button>Taco</button>
+          <Listbox>
+            <ListboxOption value="ford">Ford</ListboxOption>
+            <ListboxOption value="tesla">Tesla</ListboxOption>
+            <ListboxOption value="toyota">Toyota</ListboxOption>
+          </Listbox>
+          <button>Burger</button>
+        </>
+      );
+      const listbox = getByRole("listbox");
+      const taco = getByText("Taco");
+      const burger = getByText("Burger");
+
+      expect(document.body).toHaveFocus();
+
+      userEvent.tab();
+      userEvent.tab();
+
+      expect(listbox).toHaveFocus();
+
+      userEvent.tab();
+
+      expect(burger).toHaveFocus();
+
+      userEvent.tab({ shift: true });
+      userEvent.tab({ shift: true });
+
+      expect(taco).toHaveFocus();
     });
 
     test("multi-select: selecting an option sets the correct aria-activedescendant", () => {
@@ -470,6 +506,40 @@ describe("Listbox", () => {
       const listbox = getByRole("listbox");
 
       expect(listbox).toHaveAttribute("aria-activedescendant", tesla.id);
+    });
+
+    test("can move focus from listbox to next (tab) & previous (shift+tab) element", () => {
+      const INITIAL_FOCUSED_INDEX = 1;
+      const { getByRole, getByText } = render(
+        <>
+          <button>Taco</button>
+          <Listbox focusedIndex={INITIAL_FOCUSED_INDEX}>
+            <ListboxOption value="ford">Ford</ListboxOption>
+            <ListboxOption value="tesla">Tesla</ListboxOption>
+            <ListboxOption value="toyota">Toyota</ListboxOption>
+          </Listbox>
+          <button>Burger</button>
+        </>
+      );
+      const listbox = getByRole("listbox");
+      const taco = getByText("Taco");
+      const burger = getByText("Burger");
+
+      expect(document.body).toHaveFocus();
+
+      userEvent.tab();
+      userEvent.tab();
+
+      expect(listbox).toHaveFocus();
+
+      userEvent.tab();
+
+      expect(burger).toHaveFocus();
+
+      userEvent.tab({ shift: true });
+      userEvent.tab({ shift: true });
+
+      expect(taco).toHaveFocus();
     });
 
     test("sets the correct aria-selected attribute", () => {

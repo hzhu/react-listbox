@@ -14,7 +14,8 @@ export type KEY =
   | "UP"
   | "RIGHT"
   | "DOWN"
-  | "DELETE";
+  | "DELETE"
+  | "SHIFT";
 
 export const KEY_CODES: Record<KEY, number> = {
   BACKSPACE: 8,
@@ -31,6 +32,7 @@ export const KEY_CODES: Record<KEY, number> = {
   RIGHT: 39,
   DOWN: 40,
   DELETE: 46,
+  SHIFT: 16,
 };
 
 export type Handlers = (Function | undefined)[];
