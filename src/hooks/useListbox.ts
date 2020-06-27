@@ -79,11 +79,16 @@ export interface IUseListboxReturnValue {
   optionsRef: MutableRefObject<RefObject<HTMLLIElement>[]>;
 }
 
+export interface IDefaultProps {
+  defaultSelectedIndex?: number;
+}
+
 export interface IListboxProps {
   onChange?: (option: IOption) => void;
   onSelect?: (value: IOption | SelectedValues) => void;
   multiSelect?: boolean;
   focusedIndex?: number;
+  defaultSelectedIndex?: number;
   selectedIndex?: number | number[];
 }
 
@@ -185,9 +190,17 @@ const handleFocus = ({
   dispatch,
   options,
   multiSelect,
+  defaultSelectedIndex,
 }: IHandlerArg) => (e: FocusEvent<HTMLUListElement>) => {
+  let option;
+
+  if (typeof defaultSelectedIndex === "number") {
+    option = options.current[defaultSelectedIndex];
+  } else {
+    option = options.current[0];
+  }
+
   if (state.focusedValue === "") {
-    const option = options.current[0];
     dispatch({ type: FOCUS_OPTION, payload: option });
     if (!multiSelect) {
       dispatch({ type: SELECT_OPTION, payload: option });
@@ -296,11 +309,25 @@ const handleKeyDown = ({
   }
 };
 
+function initialStateFn(defaultProps: IDefaultProps) {
+  const { defaultSelectedIndex } = defaultProps;
+
+  if (typeof defaultSelectedIndex !== "number") {
+    return initialState;
+  }
+
+  return {
+    ...initialState,
+    selectedIndex: defaultSelectedIndex,
+  };
+}
+
 export const useListbox: UseListboxType = ({
   onChange,
   onSelect,
   multiSelect,
   listboxRef,
+  defaultSelectedIndex,
   focusedIndex: controlledFocusedIndex,
   selectedIndex: controlledSelectedIndex,
 }) => {
@@ -308,7 +335,8 @@ export const useListbox: UseListboxType = ({
     controlledSelectedIndex != null || controlledFocusedIndex != null;
   const options = useRef<IOption[]>([]);
   const optionsRef = useRef<MutableRefObject<HTMLLIElement>[]>([]);
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const defaultProps = { defaultSelectedIndex };
+  const [state, dispatch] = useReducer(reducer, defaultProps, initialStateFn);
   const handlerArgs = {
     state,
     dispatch,
@@ -318,6 +346,7 @@ export const useListbox: UseListboxType = ({
     multiSelect,
     optionsRef,
     listboxRef,
+    defaultSelectedIndex,
   };
   const controlledHandlerArgs = {
     state: {
@@ -329,13 +358,7 @@ export const useListbox: UseListboxType = ({
     onSelect,
   };
 
-  const {
-    focusedIndex,
-    selectedId,
-    selectedIndex,
-    selectedValue,
-    selectedValues,
-  } = state;
+  const { focusedIndex, selectedIndex, selectedValue, selectedValues } = state;
 
   useEffect(() => {
     if (isControlled === false) {
@@ -397,7 +420,7 @@ export const useListbox: UseListboxType = ({
         if (id === (selectedValues[value] && selectedValues[value].id)) {
           ariaSelected = true;
         }
-      } else if (id === selectedId) {
+      } else if (index === selectedIndex) {
         ariaSelected = true;
       }
     }

@@ -23,6 +23,7 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
       multiSelect,
       focusedIndex,
       selectedIndex,
+      defaultSelectedIndex,
       children,
       ...restProps
     } = props;
@@ -35,10 +36,11 @@ export const Listbox = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
       {
         onChange,
         onSelect,
+        listboxRef,
         multiSelect,
         focusedIndex,
         selectedIndex,
-        listboxRef,
+        defaultSelectedIndex,
       }
     );
 
@@ -71,10 +73,12 @@ Listbox.propTypes = {
   onSelect: PropTypes.func,
   /** Turns on multi-select listbox behavior. Only useful for [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) listbox usages.*/
   multiSelect: PropTypes.bool,
-  /** An index of the foucsed option. Only useful for [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) listbox usages.*/
+  /** Sets the focused index. Only useful for [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) listbox usages.*/
   focusedIndex: PropTypes.number,
   /** An index or array of indices of the selected value(s). Only useful for [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) listbox usages.*/
   selectedIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.array]),
+  /** Sets the default selected index. Only useful for [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) listbox usages.*/
+  defaultSelectedIndex: PropTypes.number,
 };
 
 Listbox.displayName = "Listbox";

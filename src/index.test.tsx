@@ -95,6 +95,20 @@ describe("Listbox", () => {
   });
 
   describe("Uncontrolled Usage", () => {
+    test("uses a defaultIndex to preset uncontrolled state", () => {
+      const { getByText } = render(
+        <Listbox defaultSelectedIndex={1}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const tesla = getByText("Tesla");
+
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+      userEvent.tab();
+      expect(tesla).toHaveAttribute("aria-selected", "true");
+    });
     test("single-select: selecting an option sets the correct aria-activedescendant", () => {
       const { getByRole, getByText } = render(
         <Listbox>
