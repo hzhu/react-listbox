@@ -55,6 +55,10 @@ export const ListboxOption = forwardRef<HTMLLIElement, IListboxOptionProps>(
     const optionRef = useRef<HTMLLIElement>(null);
     const mergedRef = useMergeRefs(ref, optionRef);
 
+    if (index === -1) {
+      return <li>{props.children}</li>;
+    }
+
     options.current[index] = { id, value, index };
     optionsRef.current[index] = optionRef;
 
