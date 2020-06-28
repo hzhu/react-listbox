@@ -14,7 +14,9 @@ export const useFindItemToFocus = (
       listboxRef.current.querySelectorAll('[role="option"]');
     const character = e.key;
 
-    cacheTypedChars.current += character.toLowerCase();
+    if (character.length === 1) {
+      cacheTypedChars.current += character.toLowerCase();
+    }
 
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);

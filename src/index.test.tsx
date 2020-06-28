@@ -673,6 +673,29 @@ describe("Listbox", () => {
       });
     });
 
+    test("calls onSelect with the correct option on alphanumeric key selection", () => {
+      const onSelect = jest.fn();
+      const controlledIndex = 1;
+      const { getByText, getByRole } = render(
+        <Listbox onSelect={onSelect} focusedIndex={controlledIndex}>
+          <ListboxOption value="ford">Ford</ListboxOption>
+          <ListboxOption value="tesla">Tesla</ListboxOption>
+          <ListboxOption value="toyota">Toyota</ListboxOption>
+        </Listbox>
+      );
+      const listbox = getByRole("listbox");
+      const tesla = getByText("Tesla");
+
+      fireEvent.keyDown(listbox, { key: "T" });
+
+      expect(onSelect).toBeCalledTimes(1);
+      expect(onSelect).toBeCalledWith({
+        id: tesla.id,
+        index: controlledIndex,
+        value: "tesla",
+      });
+    });
+
     test("calls onSelect with the correct option on pointer selection", () => {
       const onSelect = jest.fn();
       const controlledFocusedIndex = 1;

@@ -1,0 +1,27 @@
+.select-style-example [aria-selected="true"] {
+  background-color: #bde4ff;
+}
+
+.select-style-example ul {
+  margin: 0;
+  padding: 0;
+  height: 250px;
+  width: 272px;
+  position: absolute;
+  overflow-y: scroll;
+  list-style: none;
+  border: 2px solid #ccc;
+}
+
+.select-style-example li {
+  padding: 4px 12px;
+}
+
+.select-style-example button {
+  width: 275px;
+  padding: 6px 12px;
+  font-size: 16px;
+  text-align: left;
+  border-radius: 4px;
+  background: rgb(255, 255, 255);
+}

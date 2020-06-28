@@ -99,6 +99,8 @@ export interface IUseListboxProps extends IListboxProps {
 export interface IControlledHandlerArgs extends IListboxProps {
   state: IControlledListboxState;
   options: MutableRefObject<IOption[]>;
+  listboxRef: RefObject<HTMLUListElement>;
+  optionsRef: MutableRefObject<MutableRefObject<HTMLLIElement>[]>;
 }
 
 export interface IHandlerArg extends IListboxProps {
@@ -189,8 +191,11 @@ const handleFocus = ({
   state,
   dispatch,
   options,
+  listboxRef,
+  optionsRef,
   multiSelect,
   defaultSelectedIndex,
+  focusedIndex: controlledFocusedIndex,
 }: IHandlerArg) => (e: FocusEvent<HTMLUListElement>) => {
   let option;
 
@@ -200,11 +205,18 @@ const handleFocus = ({
     option = options.current[0];
   }
 
-  if (state.focusedValue === "") {
+  if (state.focusedValue === "" && options.current.length) {
     dispatch({ type: FOCUS_OPTION, payload: option });
     if (!multiSelect) {
       dispatch({ type: SELECT_OPTION, payload: option });
     }
+  }
+
+  if (controlledFocusedIndex !== undefined && controlledFocusedIndex > -1) {
+    focusElement(
+      optionsRef.current[controlledFocusedIndex].current,
+      listboxRef.current
+    );
   }
 };
 
@@ -213,6 +225,8 @@ const handleKeyDownControlled = ({
   options,
   onChange,
   onSelect,
+  listboxRef,
+  optionsRef,
 }: IControlledHandlerArgs) => (e: KeyboardEvent<HTMLUListElement>) => {
   const key = e.which || e.keyCode;
 
@@ -228,6 +242,7 @@ const handleKeyDownControlled = ({
     case KEY_CODES.UP:
       if (focusedIndex > 0) {
         const nextIndex = focusedIndex - 1;
+        focusElement(optionsRef.current[nextIndex].current, listboxRef.current);
         const option = options.current[nextIndex];
         onChange && onChange(option);
       }
@@ -235,6 +250,7 @@ const handleKeyDownControlled = ({
     case KEY_CODES.DOWN:
       if (focusedIndex !== options.current.length - 1) {
         const nextIndex = focusedIndex + 1;
+        focusElement(optionsRef.current[nextIndex].current, listboxRef.current);
         const option = options.current[nextIndex];
         onChange && onChange(option);
       }
@@ -347,6 +363,7 @@ export const useListbox: UseListboxType = ({
     optionsRef,
     listboxRef,
     defaultSelectedIndex,
+    focusedIndex: controlledFocusedIndex,
   };
   const controlledHandlerArgs = {
     state: {
@@ -356,6 +373,8 @@ export const useListbox: UseListboxType = ({
     options,
     onChange,
     onSelect,
+    optionsRef,
+    listboxRef,
   };
 
   const { focusedIndex, selectedIndex, selectedValue, selectedValues } = state;
@@ -386,8 +405,16 @@ export const useListbox: UseListboxType = ({
   }, [onChange, focusedIndex, isControlled]);
 
   const onFound = (index: number) => {
-    dispatch({ type: FOCUS_OPTION, payload: options.current[index] });
-    dispatch({ type: SELECT_OPTION, payload: options.current[index] });
+    const option = options.current[index];
+
+    dispatch({ type: FOCUS_OPTION, payload: option });
+    dispatch({ type: SELECT_OPTION, payload: option });
+
+    if (isControlled && option) {
+      onSelect && onSelect(option);
+    }
+
+    focusElement(optionsRef.current[index].current, listboxRef.current);
   };
 
   const onFindItemToFocus = useFindItemToFocus(listboxRef, onFound);
