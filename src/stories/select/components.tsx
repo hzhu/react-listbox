@@ -73,7 +73,7 @@ interface ISelectContext {
   labelId: string;
   buttonId: string;
   listboxId: string;
-  expanded: boolean;
+  expanded?: boolean;
   dispatch: Dispatch<SelectActionTypes>;
   onChange: (option: IOption | SelectedValues) => void;
 }
@@ -105,6 +105,22 @@ export const Button = forwardRef<
 >((props, ref) => {
   const { value, expanded, dispatch, labelId, buttonId } = useSelectContext();
   const onClick = () => dispatch({ type: "expand" });
+
+  if (true) {
+    return (
+      <button
+        ref={ref}
+        id={buttonId}
+        onClick={onClick}
+        aria-haspopup="listbox"
+        aria-expanded={expanded}
+        aria-labelledby={`${labelId} ${buttonId}`}
+        {...props}
+      >
+        {props.children || value}
+      </button>
+    );
+  }
 
   return (
     <button
@@ -157,8 +173,10 @@ export const List = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
         ref={listboxRef}
         onSelect={onSelect}
         onChange={onSelect}
-        focusedIndex={index}
-        selectedIndex={index}
+        selectedIndex={props.selectedIndex ? props.selectedIndex : index}
+        focusedIndex={
+          typeof props.selectedIndex === "number" ? props.selectedIndex : index
+        }
         aria-labelledby={labelId}
         onBlur={() => dispatch({ type: "collapse" })}
         onKeyDown={(e) => {
@@ -245,23 +263,31 @@ const reducer: ReducerType = (state, action) => {
 };
 
 export interface ISelectProps {
+  expanded?: boolean;
   onChange: (option: IOption | SelectedValues) => void;
 }
 
-export const Select: React.FC<ISelectProps> = ({ onChange, children }) => {
+export const Select: React.FC<ISelectProps> = ({
+  expanded,
+  onChange,
+  children,
+}) => {
   const id = useId();
   const labelId = `select-label-${id}`;
   const buttonId = `select-button-${id}`;
   const listboxId = `select-listbox-${id}`;
   const [state, dispatch] = useReducer(reducer, initialState);
+  const controlled = expanded != null;
 
   const context = {
     ...state,
     labelId,
     buttonId,
     listboxId,
+    expanded: controlled ? expanded : state.expanded,
     onChange,
     dispatch,
+    controlled,
   };
 
   return (

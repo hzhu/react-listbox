@@ -213,10 +213,12 @@ const handleFocus = ({
   }
 
   if (controlledFocusedIndex !== undefined && controlledFocusedIndex > -1) {
-    focusElement(
-      optionsRef.current[controlledFocusedIndex].current,
-      listboxRef.current
-    );
+    if (optionsRef.current.length) {
+      focusElement(
+        optionsRef.current[controlledFocusedIndex].current,
+        listboxRef.current
+      );
+    }
   }
 };
 
