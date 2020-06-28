@@ -1,9 +1,9 @@
 import React, { useState, useCallback, CSSProperties } from "react";
 import { withKnobs, boolean } from "@storybook/addon-knobs";
-import { Listbox } from "./components/Listbox";
-import { ListboxOption } from "./components/ListboxOption";
-import { ListboxGroup } from "./components/ListboxGroup";
-import { SelectedValues, IOption } from "./hooks/useListbox";
+import { Listbox } from "../../components/Listbox";
+import { ListboxOption } from "../../components/ListboxOption";
+import { ListboxGroup } from "../../components/ListboxGroup";
+import { SelectedValues, IOption } from "../../hooks/useListbox";
 import "./stories.css";
 
 const CAR_COMPANIES = [
