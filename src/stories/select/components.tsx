@@ -73,7 +73,7 @@ interface ISelectContext {
   labelId: string;
   buttonId: string;
   listboxId: string;
-  expanded: boolean;
+  expanded?: boolean;
   dispatch: Dispatch<SelectActionTypes>;
   onChange: (option: IOption | SelectedValues) => void;
 }
@@ -116,7 +116,7 @@ export const Button = forwardRef<
       aria-labelledby={`${labelId} ${buttonId}`}
       {...props}
     >
-      {value || props.children}
+      {props.children || value}
     </button>
   );
 });
@@ -157,8 +157,10 @@ export const List = forwardRef<HTMLUListElement, IListboxPropsAttributes>(
         ref={listboxRef}
         onSelect={onSelect}
         onChange={onSelect}
-        focusedIndex={index}
-        selectedIndex={index}
+        selectedIndex={props.selectedIndex ? props.selectedIndex : index}
+        focusedIndex={
+          typeof props.selectedIndex === "number" ? props.selectedIndex : index
+        }
         aria-labelledby={labelId}
         onBlur={() => dispatch({ type: "collapse" })}
         onKeyDown={(e) => {
@@ -245,23 +247,31 @@ const reducer: ReducerType = (state, action) => {
 };
 
 export interface ISelectProps {
+  expanded?: boolean;
   onChange: (option: IOption | SelectedValues) => void;
 }
 
-export const Select: React.FC<ISelectProps> = ({ onChange, children }) => {
+export const Select: React.FC<ISelectProps> = ({
+  expanded,
+  onChange,
+  children,
+}) => {
   const id = useId();
   const labelId = `select-label-${id}`;
   const buttonId = `select-button-${id}`;
   const listboxId = `select-listbox-${id}`;
   const [state, dispatch] = useReducer(reducer, initialState);
+  const controlled = expanded != null;
 
   const context = {
     ...state,
     labelId,
     buttonId,
     listboxId,
+    expanded: controlled ? expanded : state.expanded,
     onChange,
     dispatch,
+    controlled,
   };
 
   return (

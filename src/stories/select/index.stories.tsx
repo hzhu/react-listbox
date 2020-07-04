@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Select, List, Option, Button, Label } from "./components";
 import "./style.css";
 
@@ -43,6 +43,40 @@ Uncontrolled.story = {
     docs: {
       storyDescription: `An [uncontrolled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _state_, while a
       controlled component is driven by _props_. This Select component demonstrates uncontrolled single-select behavior.`,
+    },
+  },
+};
+
+export const Controlled = () => {
+  const [index, setIndex] = useState(3);
+  const [expanded, setExpanded] = useState(false);
+  const toggle = () => setExpanded(!expanded);
+
+  return (
+    <div className="select-style-example">
+      <Select
+        expanded={expanded}
+        onChange={(option) => setIndex(option.index as number)}
+      >
+        <Label>Select a car:</Label>
+        <Button onClick={toggle}>{CAR_COMPANIES[index].name}</Button>
+        <List onBlur={toggle} selectedIndex={index}>
+          {CAR_COMPANIES.map((car) => (
+            <Option key={car.name} value={car.name}>
+              {car.name}
+            </Option>
+          ))}
+        </List>
+      </Select>
+    </div>
+  );
+};
+
+Controlled.story = {
+  parameters: {
+    docs: {
+      storyDescription: `An [controlled](https://gist.github.com/ryanflorence/e2fa045ad523f2228d34ce3f94df75b3) component is driven by _props_, while a
+      uncontrolled component is driven by _state_. This Select component demonstrates controlled single-select behavior.`,
     },
   },
 };

@@ -20,6 +20,7 @@
 .select-style-example button {
   width: 275px;
   padding: 6px 12px;
+  margin-bottom: 2px;
   font-size: 16px;
   text-align: left;
   border-radius: 4px;
